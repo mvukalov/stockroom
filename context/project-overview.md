@@ -53,7 +53,7 @@ Not used: Next.js (summit-drift covers it), Tailwind, Angular/Vue.
 The API contract is defined first and does not change between phases, so the frontend is not rewritten when the real backend arrives.
 
 ### Phase 0: Planning
-Decisions, context files, ADRs, screen list, design direction, Lovable prototypes (screenshots only), manual repo bootstrap (`create-vite`, pnpm workspaces).
+Decisions, context files, ADRs, screen list, design direction, Lovable prototypes (screenshots only, done), manual repo bootstrap (`create-vite`, pnpm workspaces).
 
 ### Phase 1: Frontend against a mocked API
 - Contract package (Zod schemas shared by client, mock and real API).
@@ -78,13 +78,50 @@ Mobile client, real-time updates, Croatian locale.
 
 - `Product` (from seed): sku, title, category, brand, price, weight, dimensions, minimumOrderQuantity
 - `Category`, `Supplier`, `Warehouse`, `Location`
-- `StockMovement` (append-only): id (client-generated UUID), type, productId, locationId, quantity, reason, createdBy, createdAt
+- `StockMovement` (append-only): id (client-generated UUID), type, productId, locationId, destinationLocationId (`TRANSFER` only), quantity, reason, createdBy, createdAt
 - `StockLevel`: projection derived from movements, never edited directly
 - `Order` with lines. Status machine: `DRAFT -> CONFIRMED -> PICKED -> SHIPPED`, plus `CANCELLED`
 - `User` with role
-- `AuditLogEntry`
+- `AuditLogEntry`: movement created, order status changed, order edited, role changed
 
 Pure domain logic (stock calculation, order state machine, permission rules) lives in a framework-free package and is tested in isolation.
+
+### Domain rules (decided during prototype review, Oct 2026)
+
+These are the rules the prototype settled. The domain package must enforce them and tests must cover them.
+
+**Stock movements**
+- The movements list always shows the sign: `RECEIPT` is positive, `ISSUE` is negative, `ADJUSTMENT` can be either. Whether the sign is stored on `quantity` or derived from the type is an implementation detail for the contract; decide it once in `packages/contract` and keep the domain rules identical.
+- `TRANSFER` is **one** movement with a source and a destination location, not two linked rows. Its quantity is unsigned and positive, and it is shown without a sign (for example `32` with `A-01-03 -> B-01-04`).
+- `ISSUE` and `TRANSFER` cannot exceed the stock available at the source location. An `ADJUSTMENT` cannot take stock below zero. Violations are blocking validation errors (Save is disabled), not warnings.
+- `ADJUSTMENT` requires a reason. Other types have an optional reason.
+- Movements are immutable and there is no delete. A mistake is corrected with a new `ADJUSTMENT`.
+- **Undo is a pre-commit window, not a reversal.** After "Save movement" the row appears in a pending state with a "Saving movement... Undo" toast for 5 seconds. Undo within that window discards the movement without ever sending it. After the window it is committed and can only be corrected by an adjustment.
+- If the server rejects a movement (for example stock changed in the meantime), the optimistic row rolls back to a failed row with the cause ("Could not save: only 14 on hand now") and a visible Retry. Retry reuses the same client-generated ID, so it is idempotent.
+
+**Products**
+- There is no direct stock editing and no product deletion. Stock is changed with "Create adjustment"; products are removed from use with "Archive". A product with history keeps its movement history.
+- Bulk actions on a selection: Update category, Create adjustment, Archive, Export CSV.
+
+**Orders**
+- Lines are editable only in `DRAFT`. `CONFIRMED`, `PICKED` and `SHIPPED` are read-only.
+- **Confirm is blocked while any line exceeds available stock.** The UI states why ("2 lines exceed available stock. Reduce the quantity or remove the line to confirm.") and marks the affected lines. A confirmed, picked or shipped order can therefore never show a shortage.
+- Subtotal, VAT (25 %) and total are always derived from the lines, never stored independently.
+- Cancelling is irreversible and goes through a confirmation modal. `CANCELLED` is a terminal state reachable from `DRAFT`, `CONFIRMED` and `PICKED`; nothing follows it.
+- Order numbers are `ORD-2026-NNNN` and increase with creation time. Each order has an activity timeline (status changes with user and time).
+- Dashboard "Open orders" counts `DRAFT` + `CONFIRMED` + `PICKED`.
+
+**Audit log**
+- Read-only. Event types: movement created, order status changed, order edited, role changed. It contains more events than the movements list (movements plus order and user events).
+- Audit entries must be consistent with current data: the order status in an event matches the order's real status path, and "order edited" events exist only for orders that were in `DRAFT` when edited.
+
+**Permissions** (pure function `(user, action, resource) -> boolean`)
+- `ADMIN`: everything, including creating products.
+- `CLERK`: create stock movements, create and edit orders, move orders through the status flow.
+- `VIEWER`: read-only. Every mutating control stays visible but is disabled with the explanation "Your role is read-only", plus a "Read-only access" badge in the top bar. Navigation, filters, sorting and Export CSV remain available.
+- Open question: whether `CLERK` may cancel orders and archive products. Decide in an ADR together with the permission function.
+
+**Open question: stock reservation.** The cancel modal says reserved stock is released, and Confirm checks availability. This implies that confirming an order reserves stock (available = on hand minus reserved). Decide whether reservations are a derived projection from confirmed orders (preferred, keeps the movement log pure) or a stored value, and record it in an ADR before the orders feature.
 
 ## 6. Scope of phase 1
 
@@ -113,24 +150,33 @@ Pure domain logic (stock calculation, order state machine, permission rules) liv
 
 Billing or paywall, multi-tenancy, barcode scanning, mobile app, real-time sync, Angular/Vue, Next.js, backend-only features, i18n beyond English.
 
-## 7. Screens (to prototype in Lovable, screenshots only)
+## 7. Screens (prototyped in Lovable, screenshots only)
 
-Each screen is prototyped with its states: loading, empty, error, permission denied where relevant.
+The prototype is done. Screenshots are in `context/design/` (see its `README.md` for naming and known prototype limitations). The Lovable code is throwaway and is not copied into the repo.
 
-1. Dashboard: KPI cards, low-stock list
-2. Products: `DataTable` with filters
-3. Stock movements: virtualized history + "new movement" form
-4. Orders list
-5. Order detail: line items, status transitions
-6. Audit log
-7. VIEWER view: same screens with disabled actions
+1. Dashboard: KPI cards, low-stock list (default, loading, empty, error)
+2. Products: `DataTable` with filters, bulk selection (default, loading, empty with active filters, error)
+3. Stock movements: virtualized history (default, loading, empty, error)
+3b. New movement drawer: empty, validation errors, over stock, submitting (pending), success with Undo, failure with Retry
+4. Orders list (default, loading, empty, error)
+5. Order detail: Draft with shortages, Draft with stock OK, Confirmed, Picked, Shipped, Cancelled, loading, error, cancel confirmation modal
+6. Audit log (default, loading, empty with filters, error, expanded row)
+7. Shell: collapsible sidebar, top bar with search and role switcher
+
+Not prototyped, specified by text only: the VIEWER pass (rules above), a narrow-viewport layout, per-tab empty states on Orders, the Dashboard movement chart. Mobile is desktop-first at 375 px minimum per `design-direction.md`.
 
 ## 8. Data strategy
 
 1. **Catalog:** one-time snapshot of DummyJSON products saved as `seed/products.json`. The app never calls DummyJSON at runtime.
 2. **Everything else:** generated with `@faker-js/faker` and a fixed seed: suppliers, warehouses, locations, users per role, 12 months of movements, orders.
-3. **Volume:** large on purpose, so virtualization and pagination are justified.
+3. **Volume:** large on purpose, so virtualization and pagination are justified. Prototype reference figures: about 194 products, 48,213 movements, 26 orders, 52,964 audit events.
 4. The same seed feeds MSW (phase 1) and the Prisma seed (phase 2).
+5. **Seed consistency rules** (the prototype showed how easily data contradicts itself):
+   - The current moment is fixed in the seed; no timestamp is later than "now".
+   - Stock levels are computed from the generated movements, never generated separately, so the dashboard, products, forms and order availability always agree.
+   - Order statuses, order lines, totals and audit events are generated from the same source, so every audit event matches the order's real status path.
+   - Staff are a small fixed set (one `ADMIN`, one or more `CLERK`, one `VIEWER`). A `VIEWER` never creates movements or edits orders.
+   - Money is stored as integer cents and VAT is computed, not stored.
 
 ## 9. Architecture rules
 
