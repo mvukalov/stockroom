@@ -119,9 +119,9 @@ These are the rules the prototype settled. The domain package must enforce them 
 - `ADMIN`: everything, including creating products.
 - `CLERK`: create stock movements, create and edit orders, move orders through the status flow.
 - `VIEWER`: read-only. Every mutating control stays visible but is disabled with the explanation "Your role is read-only", plus a "Read-only access" badge in the top bar. Navigation, filters, sorting and Export CSV remain available.
-- Open question: whether `CLERK` may cancel orders and archive products. Decide in an ADR together with the permission function.
+- `CLERK` may cancel orders but may not archive or edit products (ADR-0004).
 
-**Open question: stock reservation.** The cancel modal says reserved stock is released, and Confirm checks availability. This implies that confirming an order reserves stock (available = on hand minus reserved). Decide whether reservations are a derived projection from confirmed orders (preferred, keeps the movement log pure) or a stored value, and record it in an ADR before the orders feature.
+Stock reservation is decided in ADR-0003 (availability is derived: on hand minus quantities on confirmed and picked orders).
 
 ## 6. Scope of phase 1
 
