@@ -40,9 +40,9 @@ Read first: `context/project-overview.md` ("Domain rules"), ADR-0003 (availabili
 | `movement.create` | yes | yes | no |
 | `order.create`, `order.edit` | yes | yes | no |
 | `order.transition` (confirm, pick, ship) | yes | yes | no |
-| `order.cancel` | yes | per ADR-0004 | no |
+| `order.cancel` | yes | yes | no |
 | `product.create` | yes | no | no |
-| `product.archive`, `product.update` | yes | per ADR-0004 | no |
+| `product.archive`, `product.update` | yes | no | no |
 | `role.change` | yes | no | no |
 
 - [ ] `denialReason(user, action)` returns the text for the disabled-control explanation (VIEWER: "Your role is read-only").
@@ -70,4 +70,4 @@ Read first: `context/project-overview.md` ("Domain rules"), ADR-0003 (availabili
 ## Notes
 
 - No new libraries. Property-testing libraries (fast-check) are out unless Martin approves.
-- Depends on: contract phase 1 merged, ADR-0004 decided.
+- Depends on: contract phase 1 merged (ADR-0004 is accepted).
