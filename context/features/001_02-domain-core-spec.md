@@ -2,7 +2,7 @@
 
 Pure TypeScript rules for stock, orders and permissions in `packages/domain`. No React, no browser APIs, no I/O, no `Date.now()` or `Math.random()` (time is a parameter). Everything is deterministic and tested in isolation. The seed, the MSW handlers and later the real API call these functions; nobody re-implements them.
 
-Read first: `context/project-overview.md` ("Domain rules"), ADR-0003 (availability), ADR-0004 (permissions), `context/coding-standards.md`. Contract types come from `packages/contract` (see `contract-seed-msw-spec.md`, phase 1, which must be merged first).
+Read first: `context/project-overview.md` ("Domain rules"), ADR-0003 (availability), ADR-0004 (permissions), `context/coding-standards.md`. Contract types come from `packages/contract` (see `001_01-contract-spec.md`, which must be merged first).
 
 ## Goals
 
@@ -40,9 +40,9 @@ Read first: `context/project-overview.md` ("Domain rules"), ADR-0003 (availabili
 | `movement.create` | yes | yes | no |
 | `order.create`, `order.edit` | yes | yes | no |
 | `order.transition` (confirm, pick, ship) | yes | yes | no |
-| `order.cancel` | yes | yes | no |
+| `order.cancel` | yes | per ADR-0004 | no |
 | `product.create` | yes | no | no |
-| `product.archive`, `product.update` | yes | no | no |
+| `product.archive`, `product.update` | yes | per ADR-0004 | no |
 | `role.change` | yes | no | no |
 
 - [ ] `denialReason(user, action)` returns the text for the disabled-control explanation (VIEWER: "Your role is read-only").
@@ -64,10 +64,10 @@ Read first: `context/project-overview.md` ("Domain rules"), ADR-0003 (availabili
 ## Does not include
 
 - React hooks, the permission HOC, or any UI (the role-based UI feature uses `can`).
-- The contract schemas (phase 1 of the other spec) and any seed or handler code.
+- The contract schemas (spec 001_01) and any seed or handler code.
 - Persistence or concurrency control. The real API handles the "two confirms at once" case in phase 2.
 
 ## Notes
 
 - No new libraries. Property-testing libraries (fast-check) are out unless Martin approves.
-- Depends on: contract phase 1 merged (ADR-0004 is accepted).
+- Depends on: spec 001_01 (contract) merged; ADR-0004 is accepted.

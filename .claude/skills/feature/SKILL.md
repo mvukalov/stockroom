@@ -1,7 +1,7 @@
 ---
 name: feature
 description: Manage the current feature lifecycle - load a spec, start a branch, test, review, explain, or complete via pull request
-argument-hint: load <spec> [phase]|start|test|review|explain|export|complete
+argument-hint: load <spec>|start|test|review|explain|export|complete
 disable-model-invocation: true
 ---
 
