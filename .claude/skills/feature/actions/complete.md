@@ -9,6 +9,7 @@ Everything here requires my approval at the marked steps. Never merge without it
 5. Open a PR with `gh pr create --base main`:
    - Title: conventional-commit summary of the feature
    - Body: **What**, **Why** (link to the spec file), **How to test**, **Evidence** (screenshots / Lighthouse numbers if relevant), **Trade-offs / follow-ups**
+   - **Why** contains only the spec link and the goal copied from the spec. Never invent rationale. If the spec states no reason, write only the link.
 6. Wait for CI: `gh pr checks --watch`. If the repository has no CI workflow yet, say so and continue with the local gate results as evidence. If a check fails, stop, report the failure and fix it on the branch.
 7. When CI is green and the PR body has its **Evidence** links, run the [export](export.md) action while `context/current-feature.md` still has its Goals and Notes. Never stage or commit anything under `process-notes/`.
 8. Update `context/current-feature.md` on the branch (main is protected, so this must ride along in the same PR):

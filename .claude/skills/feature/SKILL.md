@@ -25,15 +25,17 @@ Manages a feature from spec to merged pull request.
 
 Execute the requested action: $ARGUMENTS
 
-| Action     | Description                                                         |
-| ---------- | ------------------------------------------------------------------- |
-| `load`     | Load a feature spec (or inline description) into current-feature.md |
-| `start`    | Create the branch and implement the goals                           |
-| `test`     | Write and run unit, component and E2E tests for the feature         |
-| `review`   | Check goals, quality, scope and tests against `git diff main`       |
-| `explain`  | Explain what changed and how it fits together                       |
-| `export`   | Write a private learning doc to `process-notes/` (never committed)  |
-| `complete` | Commit, push, open a PR, merge after approval, clean up             |
+| Action     | Description                                                             |
+| ---------- | ----------------------------------------------------------------------- |
+| `load`     | Load a feature spec (or inline description) into current-feature.md     |
+| `start`    | Create the branch and implement the goals                               |
+| `test`     | Optional. Write and run unit, component and E2E tests for the feature   |
+| `review`   | Optional. Check goals, quality, scope and tests against `git diff main` |
+| `explain`  | Optional. Explain what changed and how it fits together                 |
+| `export`   | Write a private learning doc to `process-notes/` (never committed)      |
+| `complete` | Commit, push, open a PR, merge after approval, clean up                 |
+
+Order: `load` -> `start` -> `complete`. Between `start` and `complete`, `test` (optional), `explain` (optional) and `review` (optional) can run in any order.
 
 See [actions/](actions/) for detailed instructions.
 

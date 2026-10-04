@@ -1,5 +1,9 @@
 # Test Action
 
+If start already wrote tests for every goal that needs them, say so and only report gaps.
+
+Do not commit, push, open a PR or merge in this action. Do not ask me about committing. Committing happens only in `/feature complete`.
+
 1. Read current-feature.md to understand what was implemented.
 2. Run `git diff main --name-only` to see what changed.
 3. Decide what is worth testing — logic, behaviour and user flows, not lines of code:
@@ -12,3 +16,4 @@
 6. Run `pnpm test` (and `pnpm test:e2e` if E2E changed and the script exists). All must pass.
 7. Only if coverage is configured: run `pnpm test:coverage` (if the script exists) and report coverage for the files touched by this feature. Flag anything in `packages/domain`, `packages/contract` or `apps/web/src` below 80%.
 8. Do not write tests just to raise coverage. Explain briefly what is intentionally not tested.
+9. End by telling me the next step: "Next: `/feature complete`. Optional: `/feature explain`, `/feature review`."
