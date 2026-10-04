@@ -4,12 +4,15 @@
 
 ## 1. Purpose
 
-Second portfolio project, next to `summit-drift-storefront`.
+Stockroom is an inventory and orders management app for a small warehouse. It is built around problems that are hard to get right in a front end: stock derived from an append-only event log, safe optimistic updates with rollback, role-based UI, very large tables, and an API contract shared by the client, the mock and the real backend.
 
-- **summit-drift** proves product quality: tests, a11y, performance, deploy.
-- **Stockroom** proves **engineering depth**: advanced React patterns, TypeScript generics, state management, architecture, a real backend, Docker and CI/CD.
+Engineering goals:
 
-Target: strong mid-level frontend roles. Every feature exists because job ads ask for it (analysis of 14 ads, Oct 2026).
+- Advanced React patterns, TypeScript generics, clear state management and a framework-free domain layer.
+- Tests, accessibility and performance that are measured, not assumed.
+- A thin real backend, Docker and CI/CD in later phases, behind the same contract.
+
+The project is developed in the open: decisions are recorded as ADRs in `docs/adr/`, and the AI-assisted workflow is kept in the repository (`context/`, `.claude/`).
 
 ## 2. What it is
 
