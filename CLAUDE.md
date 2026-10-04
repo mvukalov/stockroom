@@ -62,7 +62,7 @@ Quality gate before every commit: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `p
 
 ## Skills and agents
 
-- `/feature load|start|test|review|explain|complete`: the feature cycle (`.claude/skills/feature`)
+- `/feature load|start|test|review|explain|export|complete`: the feature cycle (`.claude/skills/feature`, one action file each in `actions/`). `export` writes a private learning doc to `process-notes/` (gitignored, never committed)
 - `/research <name>`: writes only to `docs/` (`.claude/skills/research`)
 - `/cleanup check|run`: code health scan (`.claude/skills/cleanup`)
 - Agents (`.claude/agents`): `code-scanner`, `ui-reviewer`, `refactor-scanner`. Findings are not automatically true; verify each before acting.

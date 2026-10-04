@@ -1,14 +1,17 @@
 # Current Feature
 
-_No feature loaded. Run `/feature load <spec-name>` to start._
+## Status
 
-Status: None
-Spec: -
+Not Started
 
 ## Goals
 
+<!-- Goals of the loaded feature as checkable bullets. Filled by /feature load. -->
+
 ## Notes
+
+<!-- Constraints, ADRs, does-not-include items, spec path. Filled by /feature load. -->
 
 ## History
 
-<!-- Oldest first. One line per finished feature: date, name, PR number, notable decisions. -->
+<!-- Completed features, oldest first. Append only. -->
