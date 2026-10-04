@@ -37,7 +37,7 @@ Package manager is pnpm (via Corepack). Run from the repo root.
 pnpm dev          # web app on localhost
 pnpm lint         # oxlint (apps/web)
 pnpm typecheck    # tsc across the workspace
-pnpm test         # vitest (currently --passWithNoTests; remove the flag once the first test exists)
+pnpm test         # vitest across the workspace
 pnpm build        # typecheck + vite build
 pnpm format       # prettier --write (context/ and docs/ are ignored)
 ```

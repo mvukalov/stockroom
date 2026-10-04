@@ -17,6 +17,7 @@ import {
   can,
   canTransition,
   computeAvailability,
+  isOpenOrder,
   movementDeltas,
   stockByLocation,
 } from '@stockroom/domain';
@@ -205,9 +206,7 @@ describe('generateSeed', () => {
   });
 
   it('counts open orders as DRAFT + CONFIRMED + PICKED', () => {
-    const open = seed.orders.filter((o) =>
-      (['DRAFT', 'CONFIRMED', 'PICKED'] as const).some((s) => s === o.status),
-    );
+    const open = seed.orders.filter(isOpenOrder);
     expect(open).toHaveLength(
       ORDER_STATUS_MIX.DRAFT +
         ORDER_STATUS_MIX.CONFIRMED +

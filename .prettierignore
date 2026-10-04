@@ -2,3 +2,4 @@ pnpm-lock.yaml
 context/
 docs/
 process-notes/
+apps/web/public/mockServiceWorker.js

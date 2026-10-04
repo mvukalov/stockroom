@@ -39,6 +39,21 @@ export function canEditOrder(order: Pick<Order, 'status'>): boolean {
   return order.status === 'DRAFT';
 }
 
+/** Counted as "Open orders" on the dashboard: DRAFT, CONFIRMED and PICKED. */
+export function isOpenOrder(order: Pick<Order, 'status'>): boolean {
+  switch (order.status) {
+    case 'DRAFT':
+    case 'CONFIRMED':
+    case 'PICKED':
+      return true;
+    case 'SHIPPED':
+    case 'CANCELLED':
+      return false;
+    default:
+      return assertNever(order.status);
+  }
+}
+
 export type TransitionContext = {
   userId: Id;
   at: IsoDateTime;

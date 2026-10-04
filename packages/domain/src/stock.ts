@@ -5,6 +5,7 @@ import type {
   OrderStatus,
   ProductAvailability,
   StockMovement,
+  StockStatus,
 } from '@stockroom/contract';
 
 import { assertNever, err, ok, type Result } from './result';
@@ -143,6 +144,16 @@ export function computeAvailability(
     reserved: productReserved,
     available: productOnHand - productReserved,
   };
+}
+
+/** `OUT` at zero on hand, `LOW` at or below the reorder level, otherwise `IN_STOCK`. */
+export function stockStatus(
+  productOnHand: number,
+  reorderLevel: number,
+): StockStatus {
+  if (productOnHand <= 0) return 'OUT';
+  if (productOnHand <= reorderLevel) return 'LOW';
+  return 'IN_STOCK';
 }
 
 export type Allocation = { locationId: Id; quantity: number };
