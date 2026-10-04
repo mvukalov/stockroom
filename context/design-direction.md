@@ -31,7 +31,7 @@ Contrast is WCAG 2.2 AA: text at least 4.5:1, UI components and focus indicators
 | `--color-surface` | `#FFFFFF` | Cards, tables, drawers |
 | `--color-surface-subtle` | `#F1F3F6` | Table header, hover, zebra |
 | `--color-border` | `#D9DEE5` | Dividers, card borders (decorative) |
-| `--color-border-control` | `#8A94A3` | Inputs, checkboxes (3.07:1 on white) |
+| `--color-border-control` | `#7A8494` | Inputs, selects, checkboxes (3.78:1 on white, 3.56:1 on bg, 3.40:1 on subtle surface, 3.05:1 on `#E5E7EB` hover/selected row) |
 | `--color-text` | `#111827` | Body (17.7:1 on white) |
 | `--color-text-muted` | `#4B5563` | Secondary (7.6:1) |
 | `--color-text-subtle` | `#646D7A` | Hints, captions (5.2:1 on white, 4.7:1 on subtle surface) |
@@ -62,7 +62,7 @@ Contrast is WCAG 2.2 AA: text at least 4.5:1, UI components and focus indicators
 | Order `PICKED` | Warning | box |
 | Order `SHIPPED` | Success | truck |
 | Order `CANCELLED` | Neutral, struck-through label | x circle |
-| Stock level: OK / Low / Out | Success / Warning / Danger | text always shown ("In stock", "Low", "Out") |
+| Stock level: OK / Low / Out | Success / Warning / Danger | check circle / triangle alert / x circle; text always shown ("In stock", "Low", "Out") |
 
 ## 4. Typography
 
@@ -75,8 +75,11 @@ Contrast is WCAG 2.2 AA: text at least 4.5:1, UI components and focus indicators
 ## 5. Spacing, shape, elevation
 
 - 4 px base scale: 4, 8, 12, 16, 24, 32, 48.
-- Table row height: 40 px default, 32 px compact (density toggle is a nice-to-have, not required).
-- Radius: 6 px controls, 8 px cards, 999 px badges.
+- Table row height: 40 px default, without a product thumbnail; 32 px compact (density toggle is a nice-to-have, not required).
+- Table cells: 13 px (`--font-size-table-cell`), so a later change touches the token, not components.
+- Controls: 36 px high (buttons, inputs, selects); icon buttons and row actions 32 px.
+- Radius: 6 px controls, 6 px badges, 8 px cards.
+- Badges: rounded rectangle (6 px radius), 12 px text, weight 600, 24 px high.
 - Elevation: borders instead of shadows. One soft shadow only for drawers, modals and toasts.
 
 ## 6. Components to show in the prototypes

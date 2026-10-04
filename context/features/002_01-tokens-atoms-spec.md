@@ -25,7 +25,8 @@ Read first: `context/design-direction.md`, `context/design/tokens.md` (reconcile
 
 ## Decisions (confirmed)
 
-1. Control border is `#8A94A3` (3.07:1) for inputs, selects and checkboxes. Tables and cards keep the light border.
+1. Control border is `#7A8494` for inputs, selects and checkboxes. Tables and cards keep the light border.
+   Why: the first value, `#8A94A3`, reached only 2.48-2.89:1 on grey surfaces (bg, surface-subtle, hover/selected rows), so it was darkened to reach at least 3:1 on all of them (3.78 / 3.56 / 3.40 / 3.05 on white, bg, surface-subtle, `#E5E7EB`).
 2. Table cells use 13 px. It is a token, so a change later does not touch components.
 3. Table row height is 40 px, without a thumbnail in the default view.
 4. Badges have a 6 px radius, 12 px text, weight 600, 24 px height.
