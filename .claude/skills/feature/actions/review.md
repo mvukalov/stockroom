@@ -1,5 +1,7 @@
 # Review Action
 
+Do not commit, push, open a PR or merge in this action. Do not ask me about committing. Committing happens only in `/feature complete`.
+
 1. Read current-feature.md (goals, notes) and the linked spec.
 2. Review all changes: `git diff main`.
 3. Report:
@@ -15,5 +17,6 @@
 4. Run lint, typecheck, tests and build, and report the results.
 5. Final verdict: **Ready to complete** or **Needs changes** (numbered list).
 6. Set Status to "In Review" if ready.
+7. End by telling me the next step: "Next: fix the findings I approve, then `/feature complete`."
 
 Verify each finding against the code before reporting it. Do not fix anything unless asked.
