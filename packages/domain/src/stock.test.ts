@@ -7,6 +7,7 @@ import {
   onHandIn,
   reserved,
   stockByLocation,
+  stockStatus,
 } from './stock';
 import {
   adjustment,
@@ -205,4 +206,20 @@ describe('allocateIssue', () => {
   it('fails for a product with no stock', () => {
     expect(allocateIssue(stock, PRODUCT_B, 1, options).ok).toBe(false);
   });
+});
+
+describe('stockStatus', () => {
+  it.each([
+    { onHand: 0, reorderLevel: 10, expected: 'OUT' },
+    { onHand: 0, reorderLevel: 0, expected: 'OUT' },
+    { onHand: 1, reorderLevel: 10, expected: 'LOW' },
+    { onHand: 10, reorderLevel: 10, expected: 'LOW' },
+    { onHand: 11, reorderLevel: 10, expected: 'IN_STOCK' },
+    { onHand: 1, reorderLevel: 0, expected: 'IN_STOCK' },
+  ])(
+    '$onHand on hand, reorder level $reorderLevel -> $expected',
+    ({ onHand: productOnHand, reorderLevel, expected }) => {
+      expect(stockStatus(productOnHand, reorderLevel)).toBe(expected);
+    },
+  );
 });

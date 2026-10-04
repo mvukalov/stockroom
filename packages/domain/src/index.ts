@@ -4,4 +4,6 @@ export * from './stock';
 export * from './movementValidation';
 export * from './orderTotals';
 export * from './orderStateMachine';
+export * from './orderEdit';
+export * from './audit';
 export * from './permissions';

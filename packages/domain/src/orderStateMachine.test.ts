@@ -5,6 +5,7 @@ import { OrderStatus, StockMovement } from '@stockroom/contract';
 import {
   canEditOrder,
   canTransition,
+  isOpenOrder,
   nextStatuses,
   transitionOrder,
   type TransitionContext,
@@ -76,6 +77,14 @@ describe('nextStatuses', () => {
 describe('canEditOrder', () => {
   it.each(STATUSES)('%s', (status) => {
     expect(canEditOrder({ status })).toBe(status === 'DRAFT');
+  });
+});
+
+describe('isOpenOrder', () => {
+  // Written out from the spec ("Open orders" counts DRAFT + CONFIRMED + PICKED).
+  const OPEN = new Set(['DRAFT', 'CONFIRMED', 'PICKED']);
+  it.each(STATUSES)('%s', (status) => {
+    expect(isOpenOrder({ status })).toBe(OPEN.has(status));
   });
 });
 
