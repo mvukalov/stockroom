@@ -5,7 +5,7 @@ Developer = architect, Claude = executor. Martin decides what is built and why; 
 ## Roles
 
 - **Martin:** decisions, requirements, architecture, approval of every change, commit, push and merge. Must be able to explain every decision in an interview, so reads every PR.
-- **Claude Code:** research, implementation, tests, build, lint, git (only with approval), review.
+- **Claude Code:** research, implementation, tests, build, lint, git (see Git rules below), review.
 - **Claude in chat:** advice, specs, reviews, UI/UX feedback. Does not write to the repo.
 
 ## Communication
@@ -25,10 +25,11 @@ Specs live in `context/features/`; large features are split into phases. The spe
 
 - One branch per feature or fix: `feature/<name>`, `fix/<name>`.
 - Conventional commits: `feat:`, `fix:`, `chore:`, `test:`, `docs:`, `refactor:`.
-- Never commit, push or merge without explicit approval.
+- `feature/` and `fix/` branches: committing, pushing and merging happen only inside `/feature complete`. Approving its step 2 is Martin's approval for the whole sequence.
+- `chore/` and `docs/` branches (changes outside a loaded feature): commit, push and open the PR only after Martin's explicit approval of the diff, and never merge them; Martin merges those.
 - Never commit before lint, typecheck, tests and build pass.
 - No "Generated with Claude" or co-author lines in commit messages.
-- All work goes through PRs: description with what, why, how to test, and a screenshot or Lighthouse result where relevant. Squash merge, delete branch, only after green CI and Martin's approval.
+- All work goes through PRs: description with what, why, how to test, and a screenshot or Lighthouse result where relevant. Squash merge only, after green CI (or the local gate when no CI exists), then delete the branch.
 
 ## Rules for code changes
 
