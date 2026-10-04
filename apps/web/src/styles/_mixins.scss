@@ -1,0 +1,37 @@
+// Shared SCSS mixins. Values come from the CSS custom properties in tokens.css;
+// SCSS is used for structure only, never for token variables.
+
+@mixin tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+// Field look shared by Input and Select. The control border meets 3:1
+// (WCAG 1.4.11) on every background a control sits on; see tokens.test.ts.
+@mixin control-field {
+  width: 100%;
+  height: var(--control-height);
+  padding-inline: var(--space-3);
+  border: var(--border-width) solid var(--color-border-control);
+  border-radius: var(--radius-control);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  transition: border-color var(--duration-fast) var(--easing-standard);
+
+  &::placeholder {
+    color: var(--color-text-subtle);
+    opacity: 1;
+  }
+
+  &[aria-invalid='true'] {
+    border-color: var(--color-danger);
+  }
+
+  &:disabled {
+    border-color: var(--color-border);
+    background-color: var(--color-surface-subtle);
+    color: var(--color-text-subtle);
+    cursor: not-allowed;
+  }
+}
