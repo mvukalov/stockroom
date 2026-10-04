@@ -1,6 +1,6 @@
 # ADR-0003: Stock reservation for orders
 
-- **Status:** Accepted (proposed by Claude, confirm with Martin; flip to Superseded if a stored reservation is chosen)
+- **Status:** Accepted
 - **Date:** 2026-10-04
 
 ## Context
@@ -24,9 +24,9 @@ Option 1. Availability is derived, never stored.
 - `available = onHand - reserved`. Reservation is per product, not per location.
 - Shipping writes `ISSUE` movements for the order lines in the same transaction as the status change. Idempotency key: order ID plus line ID.
 - Cancel and ship need no compensating writes. Status alone changes what `reserved` returns.
-- Validation uses `available`:
+- Validation:
   - Confirm is blocked while any line exceeds `available`. The line's own draft quantity is not counted as reserved.
-  - A manual `ISSUE` or `TRANSFER` cannot exceed `available`. `ADJUSTMENT` cannot take `onHand` below zero, nor below `reserved`.
+  - A manual `ISSUE` cannot exceed the on-hand quantity at its location nor the product's `available`. A `TRANSFER` cannot exceed the on-hand quantity at its source location; reservations do not limit it, because it does not change the product total. `ADJUSTMENT` cannot take `onHand` below zero, nor below `reserved`.
 - The calculation is a pure function in `packages/domain`: `computeAvailability(movements, orders)`. The API reuses it in phase 2.
 - `Open question left to a later ADR:` whether CLERK may cancel orders or archive products.
 
