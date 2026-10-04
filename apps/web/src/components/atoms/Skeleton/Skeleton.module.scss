@@ -1,0 +1,32 @@
+.skeleton {
+  display: block;
+  width: var(--skeleton-width, 100%);
+  background-color: var(--color-neutral-bg);
+  animation: pulse var(--duration-skeleton) ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.text {
+  height: 1em;
+  border-radius: var(--radius-control);
+}
+
+.block {
+  height: var(--table-row-height);
+  border-radius: var(--radius-card);
+}
+
+.circle {
+  width: var(--skeleton-width, var(--avatar-size));
+  aspect-ratio: 1;
+  border-radius: var(--radius-round);
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}

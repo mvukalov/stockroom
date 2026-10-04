@@ -1,0 +1,7 @@
+// Square target, at least 32 px (preferred size for table row actions).
+.iconButton {
+  width: var(--control-height-compact);
+  min-width: var(--control-height-compact);
+  height: var(--control-height-compact);
+  padding: 0;
+}

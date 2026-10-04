@@ -1,0 +1,24 @@
+@use '../../../styles/mixins';
+
+.wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.select {
+  @include mixins.control-field;
+
+  appearance: none;
+  padding-right: calc(var(--space-3) + var(--icon-size-md) + var(--space-2));
+  cursor: pointer;
+}
+
+.chevron {
+  position: absolute;
+  top: 50%;
+  right: var(--space-3);
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
