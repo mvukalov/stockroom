@@ -10,7 +10,7 @@ Write a private learning document for the current feature: what was built, why, 
 ## Output
 
 - Folder: `process-notes/` at the repo root. It is listed in `.gitignore` and `.prettierignore`, so it stays local and is never pushed to GitHub. If either entry is missing, stop and tell the user before writing anything.
-- File: `process-notes/<name>.md` (or `process-notes/<name>-phase-N.md` for a phase), where `<name>` matches the spec file name (e.g. `contract-seed-msw-phase-1.md`).
+- File: named like the spec file without `-spec` (e.g. `process-notes/001_01-contract.md` for `001_01-contract-spec.md`).
 - If the file exists, ask before overwriting it.
 - Language: **Croatian** for the prose (the document is for the developer). Code, file paths, commands, commit messages and technical identifiers stay as they are, in English.
 
