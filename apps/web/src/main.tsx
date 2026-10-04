@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App.tsx';
+import './styles/index.css';
 
 // Development and the static demo run on the MSW mock. A real-API build sets
 // VITE_API_MODE=real, and Vite drops the import, so no mock code ships in it.

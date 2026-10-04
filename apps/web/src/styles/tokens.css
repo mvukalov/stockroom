@@ -1,0 +1,112 @@
+/*
+ * Design tokens (light theme). Canonical values: context/design-direction.md,
+ * reconciled in context/design/tokens.md. Names are semantic so a dark theme can
+ * redefine them later. tokens.test.ts checks the documented contrast pairs.
+ */
+
+:root {
+  /* Surfaces and borders */
+  --color-bg: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f1f3f6;
+  --color-border: #d9dee5;
+  --color-border-control: #7a8494;
+
+  /* Text */
+  --color-text: #111827;
+  --color-text-muted: #4b5563;
+  --color-text-subtle: #646d7a;
+  --color-text-on-accent: #ffffff;
+
+  /* Accent and focus */
+  --color-accent: #0f766e;
+  --color-accent-hover: #115e59;
+  --color-focus: #2563eb;
+  --color-nav-active-bg: #dbf7f3;
+  --color-nav-active-text: #005b54;
+
+  /* Semantic pairs: text on tinted background */
+  --color-success: #166534;
+  --color-success-bg: #dcfce7;
+  --color-warning: #92400e;
+  --color-warning-bg: #fef3c7;
+  --color-danger: #991b1b;
+  --color-danger-bg: #fee2e2;
+  --color-info: #1e40af;
+  --color-info-bg: #dbeafe;
+  --color-neutral: #374151;
+  --color-neutral-bg: #e5e7eb;
+
+  /* Destructive button fill (white text) */
+  --color-danger-hover: #7f1d1d;
+
+  /* Typography */
+  --font-sans:
+    'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:
+    'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, Consolas,
+    monospace;
+
+  --font-size-caption: 0.75rem; /* 12: captions, badges */
+  --font-size-table-cell: 0.8125rem; /* 13: table cells */
+  --font-size-body: 0.875rem; /* 14: body, controls */
+  --font-size-section-title: 1rem; /* 16 */
+  --font-size-page-title: 1.25rem; /* 20 */
+  --font-size-kpi: 1.75rem; /* 28 */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  --line-height-body: 1.4;
+  --line-height-tight: 1.2;
+
+  /* Spacing: 4 px scale */
+  --space-1: 0.25rem; /* 4 */
+  --space-2: 0.5rem; /* 8 */
+  --space-3: 0.75rem; /* 12 */
+  --space-4: 1rem; /* 16 */
+  --space-6: 1.5rem; /* 24 */
+  --space-8: 2rem; /* 32 */
+  --space-12: 3rem; /* 48 */
+
+  /* Shape */
+  --border-width: 1px;
+  --radius-control: 6px;
+  --radius-badge: 6px;
+  --radius-card: 8px;
+  --radius-round: 999px;
+
+  /* Sizes */
+  --control-height: 2.25rem; /* 36: buttons, inputs, selects */
+  --control-height-compact: 2rem; /* 32: icon buttons, row actions */
+  --checkbox-size: 1rem; /* 16 */
+  --target-size-min: 1.5rem; /* 24: WCAG 2.2 minimum target */
+  --badge-height: 1.5rem; /* 24 */
+  --avatar-size: 2rem; /* 32 */
+  --icon-size-sm: 0.875rem; /* 14: inside badges */
+  --icon-size-md: 1rem; /* 16: controls */
+  --table-row-height: 2.5rem; /* 40 */
+
+  /* Focus ring */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* Elevation: one soft shadow for drawers, modals and toasts */
+  --shadow-overlay:
+    0 8px 24px rgb(17 24 39 / 0.12), 0 2px 6px rgb(17 24 39 / 0.08);
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-base: 160ms;
+  --duration-skeleton: 1.2s;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-skeleton: 0ms;
+  }
+}

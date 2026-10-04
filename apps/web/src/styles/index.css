@@ -1,0 +1,5 @@
+/* Global styles, imported once in main.tsx. Order matters: fonts and tokens first. */
+@import './fonts.css';
+@import './tokens.css';
+@import './reset.css';
+@import './global.css';

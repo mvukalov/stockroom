@@ -1,0 +1,80 @@
+// The label is the click target, so it is at least 24 px even when the label
+// text is visually hidden.
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: var(--target-size-min);
+  min-height: var(--target-size-min);
+  cursor: pointer;
+}
+
+.box {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.input {
+  appearance: none;
+  display: block;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  margin: 0;
+  border: var(--border-width) solid var(--color-border-control);
+  border-radius: var(--radius-control);
+  background-color: var(--color-surface);
+  cursor: inherit;
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard);
+
+  &:checked,
+  &:indeterminate {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent);
+  }
+
+  &[aria-invalid='true'] {
+    border-color: var(--color-danger);
+  }
+
+  &:disabled {
+    border-color: var(--color-border);
+    background-color: var(--color-surface-subtle);
+    cursor: not-allowed;
+  }
+}
+
+.checkIcon,
+.mixedIcon {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  display: none;
+  color: var(--color-text-on-accent);
+  pointer-events: none;
+}
+
+.input:disabled ~ .checkIcon,
+.input:disabled ~ .mixedIcon {
+  color: var(--color-text-subtle);
+}
+
+// Indeterminate wins over checked.
+.input:checked:not(:indeterminate) ~ .checkIcon,
+.input:indeterminate ~ .mixedIcon {
+  display: block;
+}
+
+.label {
+  color: var(--color-text);
+}
+
+.root:has(.input:disabled) {
+  cursor: not-allowed;
+
+  .label {
+    color: var(--color-text-subtle);
+  }
+}
