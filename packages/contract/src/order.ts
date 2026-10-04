@@ -36,7 +36,10 @@ export type Customer = z.infer<typeof Customer>;
 export const OrderLine = z.object({
   id: Id,
   productId: Id,
-  /** Pick location; shipping writes the ISSUE movement here. */
+  /**
+   * Preferred pick location. Shipping takes stock here first, then from the other
+   * locations (`allocateIssue` in `@stockroom/domain`).
+   */
   locationId: Id,
   quantity: PositiveInt,
   /** Price snapshot taken when the line was added. */
