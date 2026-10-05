@@ -36,6 +36,7 @@ Language: English only (UI, content, code, docs, commits).
 | Forms and validation | react-hook-form + Zod | |
 | Styling | SCSS Modules + design tokens | |
 | Components | Atomic design system + Storybook | |
+| Table engine | Own `DataTable<T>` implementation (no table library) | ADR-0005 |
 | Mocking (phase 1) | MSW over the shared contract | |
 | Fake data | `@faker-js/faker` with a fixed seed | |
 | Tests | Vitest, React Testing Library, Playwright + axe, contract tests | |
@@ -45,7 +46,6 @@ Not used: Next.js (summit-drift covers it), Tailwind, Angular/Vue.
 
 ### Still open (decide via ADR before the phase that needs it)
 
-- Table engine for `DataTable<T>`: headless library vs own implementation (before the DataTable feature)
 - Virtualization library (before the virtualized lists feature)
 - API framework: Fastify or Hono (before phase 2)
 - Auth: sessions or JWT (before phase 2)
