@@ -22,6 +22,7 @@ import {
 } from './config';
 import { getDb, resetDb } from './db';
 import { latencyMs, respond } from './http';
+import { compareNames } from './listing';
 import { server } from './node';
 import { availabilityOf } from './readModels';
 
@@ -118,6 +119,7 @@ describe('every endpoint responds with its contract schema', () => {
     ['getDashboard', '/api/dashboard'],
     ['listProducts', '/api/products?sort=-onHand&pageSize=100'],
     ['listProducts', '/api/products?archived=true&stockStatus=LOW'],
+    ['listProductFilters', '/api/products/filters'],
     ['listMovements', '/api/movements?type=TRANSFER&pageSize=100'],
     ['listOrders', '/api/orders?status=DRAFT'],
     ['listAudit', '/api/audit?pageSize=100'],
@@ -174,6 +176,65 @@ describe('every endpoint responds with its contract schema', () => {
     const page = ENDPOINTS.listMovements.response.parse(result.body);
     expect(page.page).toBe(1);
     expect(page.pageSize).toBe(50);
+  });
+});
+
+describe('GET /api/products/filters', () => {
+  it('lists every category and each brand once, in name order', async () => {
+    const db = getDb();
+    const filters = ENDPOINTS.listProductFilters.response.parse(
+      (await call('/api/products/filters')).body,
+    );
+
+    expect(filters.brands).toEqual(
+      [...new Set(db.products.map((p) => p.brand))].sort(compareNames),
+    );
+    expect(filters.categories).toEqual(
+      [...db.categories].sort((a, b) => compareNames(a.name, b.name)),
+    );
+  });
+
+  it('orders brands ignoring case, accents and code-unit order', async () => {
+    const db = getDb();
+    const template = db.products[0];
+    if (!template) throw new Error('Seed has no product');
+    // A plain lowercase compare puts "Ébène" after "zeta" (é sorts after z).
+    db.products = ['zeta', 'Ébène', 'eagle', 'Ecru'].map((brand) => ({
+      ...template,
+      id: newId(),
+      brand,
+    }));
+
+    const filters = ENDPOINTS.listProductFilters.response.parse(
+      (await call('/api/products/filters')).body,
+    );
+    expect(filters.brands).toEqual(['eagle', 'Ébène', 'Ecru', 'zeta']);
+  });
+
+  it('includes a brand that only an archived product has', async () => {
+    const db = getDb();
+    const archived = db.products.find((p) => p.archivedAt !== null);
+    if (!archived) throw new Error('Seed has no archived product');
+    // The seed has no such brand, so the store gets one.
+    db.products = [
+      ...db.products,
+      { ...archived, id: newId(), brand: 'Archived Only Brand' },
+    ];
+    const filters = ENDPOINTS.listProductFilters.response.parse(
+      (await call('/api/products/filters')).body,
+    );
+    expect(filters.brands).toContain('Archived Only Brand');
+  });
+
+  it('is read by every role and refused without a known user', async () => {
+    expect((await call('/api/products/filters', { as: 'VIEWER' })).status).toBe(
+      200,
+    );
+    expectError(
+      await call('/api/products/filters', { as: null }),
+      403,
+      'FORBIDDEN',
+    );
   });
 });
 
@@ -477,6 +538,7 @@ describe('scenarios', () => {
   it('error: every endpoint fails with 500 except the user list', async () => {
     setMockConfig({ scenario: 'error' });
     expect((await call('/api/products')).status).toBe(500);
+    expect((await call('/api/products/filters')).status).toBe(500);
     expect((await call('/api/dashboard')).status).toBe(500);
     expect(
       (await call('/api/movements', { method: 'POST', body: {} })).status,
@@ -505,6 +567,9 @@ describe('scenarios', () => {
     const users = ENDPOINTS.listUsers.response.parse(
       (await call('/api/users')).body,
     );
+    const filters = ENDPOINTS.listProductFilters.response.parse(
+      (await call('/api/products/filters')).body,
+    );
 
     expect([
       products.total,
@@ -515,6 +580,7 @@ describe('scenarios', () => {
     expect(Object.values(orders.statusCounts).every((n) => n === 0)).toBe(true);
     expect(dashboard.openOrders.value).toBe(0);
     expect(dashboard.lowStock).toEqual([]);
+    expect(filters).toEqual({ categories: [], brands: [] });
     expect(users.length).toBeGreaterThan(0);
   });
 });

@@ -68,3 +68,13 @@ export const ProductListItem = z.object({
   stockStatus: StockStatus,
 });
 export type ProductListItem = z.infer<typeof ProductListItem>;
+
+/**
+ * Response of `GET /api/products/filters`: the options of the product list filters.
+ * Brands are unique and sorted case-insensitively, archived products included.
+ */
+export const ProductFilters = z.object({
+  categories: z.array(Category),
+  brands: z.array(z.string().min(1)),
+});
+export type ProductFilters = z.infer<typeof ProductFilters>;
