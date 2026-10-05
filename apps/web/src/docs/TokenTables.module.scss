@@ -1,0 +1,127 @@
+@use '../styles/mixins';
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swatch {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.chip {
+  height: var(--space-12);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.name {
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  overflow-wrap: anywhere;
+}
+
+.value {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+}
+
+// Wide tables scroll inside their container at 375 px.
+.scroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--color-text);
+  font-size: var(--font-size-table-cell);
+
+  caption {
+    padding-block-end: var(--space-2);
+    color: var(--color-text-muted);
+    text-align: start;
+  }
+
+  th,
+  td {
+    padding: var(--space-2) var(--space-3);
+    border-block-end: var(--border-width) solid var(--color-border);
+    text-align: start;
+    vertical-align: middle;
+  }
+
+  th {
+    background-color: var(--color-surface-subtle);
+    font-weight: var(--font-weight-medium);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-caption);
+  }
+}
+
+// Samples stay on one line; the table scrolls instead.
+.table .typeSample {
+  white-space: nowrap;
+}
+
+.table .numeric {
+  @include mixins.tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.sample {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: calc(var(--space-12) * 2);
+  height: var(--control-height);
+  padding-inline: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-control);
+  font-weight: var(--font-weight-medium);
+}
+
+.uiSample {
+  width: var(--space-6);
+  height: var(--space-4);
+  border: var(--focus-ring-width) solid;
+  border-radius: var(--radius-control);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 8rem 6rem 1fr;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.bar {
+  height: var(--space-4);
+  border-radius: var(--radius-control);
+  background-color: var(--color-accent);
+}
+
+.radiusBox {
+  height: var(--space-12);
+  border: var(--focus-ring-width) solid var(--color-border-control);
+  background-color: var(--color-surface-subtle);
+}
