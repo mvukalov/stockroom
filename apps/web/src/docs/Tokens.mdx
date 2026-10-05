@@ -1,0 +1,49 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+
+import {
+  ColourSwatches,
+  ContrastPairs,
+  Radii,
+  SpacingScale,
+  TypeScale,
+} from './TokenTables';
+
+<Meta title="Foundations/Tokens" />
+
+# Tokens
+
+Design tokens are CSS custom properties in `src/styles/tokens.css`. Everything on this page is read from that file, so it always shows the values the app uses. Components reference tokens with `var(--token)` and never hard-code colours, spacing or font sizes. Rationale: `context/design-direction.md`.
+
+## Colour
+
+<Unstyled>
+  <ColourSwatches />
+</Unstyled>
+
+## Contrast
+
+Ratios are computed from the hex values above with the WCAG 2.2 formula. The same pairs fail `pnpm test` if a token change breaks them.
+
+<Unstyled>
+  <ContrastPairs />
+</Unstyled>
+
+## Type scale
+
+<Unstyled>
+  <TypeScale />
+</Unstyled>
+
+## Spacing
+
+A 4 px scale.
+
+<Unstyled>
+  <SpacingScale />
+</Unstyled>
+
+## Radii
+
+<Unstyled>
+  <Radii />
+</Unstyled>
