@@ -40,13 +40,20 @@ function recordProductRequests(): Record<string, string>[] {
 
 const table = () => screen.getByRole('table', { name: 'Products' });
 
-/** Text of the body rows' Title cells, in order. */
-function titles(): string[] {
-  return within(table())
-    .getAllByRole('row')
-    .slice(1)
-    .map((row) => within(row).getAllByRole('cell')[1]?.textContent ?? '');
+/** Text of the body rows' cells in the column headed `header`, in order. */
+function columnText(header: string): string[] {
+  const [head, ...body] = within(table()).getAllByRole('row');
+  if (!head) return [];
+  const index = within(head)
+    .getAllByRole('columnheader')
+    .findIndex((cell) => cell.textContent?.startsWith(header));
+  return body.map(
+    (row) => within(row).getAllByRole('cell')[index]?.textContent ?? '',
+  );
 }
+
+/** Text of the body rows' Title cells, in order. */
+const titles = () => columnText('Title');
 
 /** Waits until rows from the API are on screen. */
 async function rowsLoaded() {
@@ -101,6 +108,7 @@ describe('ProductsPage', () => {
         .getAllByRole('columnheader')
         .map((th) => th.textContent),
     ).toEqual([
+      'Select all rows on this page',
       'SKU',
       'Title',
       'Category',
@@ -108,6 +116,7 @@ describe('ProductsPage', () => {
       'Price',
       'On hand',
       'Status',
+      'Actions',
     ]);
   });
 
@@ -445,9 +454,9 @@ describe('ProductsPage', () => {
 });
 
 describe('ProductsPage as VIEWER', () => {
-  it('shows the same list with no mutating controls', async () => {
+  it('shows the same list; mutating controls stay visible, disabled with the reason', async () => {
     window.localStorage.setItem(DEMO_USER_STORAGE_KEY, seedUser('VIEWER').id);
-    renderApp('/products');
+    const { user } = renderApp('/products');
     await rowsLoaded();
 
     expect(screen.getByRole('combobox', { name: 'Demo user' })).toHaveValue(
@@ -460,11 +469,22 @@ describe('ProductsPage as VIEWER', () => {
         .sort((a, b) => (a.toLowerCase() < b.toLowerCase() ? -1 : 1))
         .slice(0, 25),
     );
-    expect(within(table()).queryAllByRole('checkbox')).toHaveLength(0);
-    const buttons = within(screen.getByRole('main'))
-      .getAllByRole('button')
-      .map((b) => b.textContent);
-    expect(buttons).not.toContain('New product');
-    expect(buttons).not.toContain('Archive');
+    expect(
+      within(screen.getByRole('main'))
+        .getAllByRole('button')
+        .map((b) => b.textContent),
+    ).not.toContain('New product');
+
+    await user.click(
+      within(table()).getAllByRole('checkbox')[1] as HTMLElement,
+    );
+    for (const name of ['Update category', 'Archive']) {
+      const button = screen.getByRole('button', { name });
+      expect(button).toHaveAttribute('aria-disabled', 'true');
+      expect(button).toHaveAccessibleDescription('Your role is read-only');
+    }
+    expect(
+      screen.getByRole('button', { name: 'Export CSV' }),
+    ).not.toHaveAttribute('aria-disabled');
   });
 });

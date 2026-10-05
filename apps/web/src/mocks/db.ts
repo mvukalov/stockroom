@@ -21,7 +21,8 @@ export type MockDb = {
   users: readonly User[];
   categories: readonly Category[];
   locations: readonly Location[];
-  products: readonly Product[];
+  /** Replaced, never mutated in place, by `replaceProduct`. */
+  products: Product[];
   /** Chronological, oldest first. */
   movements: StockMovement[];
   /** Product id -> location id -> on hand. Projection of `movements`, kept in step by `appendMovement`. */
@@ -34,7 +35,7 @@ export type MockDb = {
   userById: ReadonlyMap<Id, User>;
   categoryById: ReadonlyMap<Id, Category>;
   locationById: ReadonlyMap<Id, Location>;
-  productById: ReadonlyMap<Id, Product>;
+  productById: Map<Id, Product>;
   movementById: Map<Id, StockMovement>;
 };
 
@@ -57,6 +58,17 @@ export function appendMovement(db: MockDb, movement: StockMovement): void {
   db.movementById.set(movement.id, movement);
 }
 
+/**
+ * Puts a changed copy of a product in place of the stored one. The seed is generated
+ * once and shared by every store, so its objects are never changed.
+ */
+export function replaceProduct(db: MockDb, product: Product): void {
+  const index = db.products.findIndex((p) => p.id === product.id);
+  if (index === -1) throw new Error(`Unknown product ${product.id}`);
+  db.products[index] = product;
+  db.productById.set(product.id, product);
+}
+
 function createDb(seed: SeedData): MockDb {
   const seedNowMs = Date.parse(seed.now);
   const createdAtMs = Date.now();
@@ -65,7 +77,8 @@ function createDb(seed: SeedData): MockDb {
     users: seed.users,
     categories: seed.categories,
     locations: seed.locations,
-    products: seed.products,
+    // Products are replaced on every change, so a shallow copy keeps the seed intact.
+    products: [...seed.products],
     movements: [],
     stock: new Map(),
     // Orders are replaced on every change, so a shallow copy keeps the seed intact.

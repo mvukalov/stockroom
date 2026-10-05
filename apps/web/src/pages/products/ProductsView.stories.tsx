@@ -12,7 +12,23 @@ import {
   productsPage,
   WIDE_PRODUCT_ROWS,
 } from './productsFixtures';
-import { ProductsSummary, ProductsView } from './ProductsView';
+import {
+  ProductsSummary,
+  ProductsView,
+  type ProductActionReasons,
+} from './ProductsView';
+
+const ALL_ALLOWED: ProductActionReasons = {
+  updateCategory: undefined,
+  archive: undefined,
+  export: undefined,
+};
+
+const selected = (ids: readonly string[]) => ({
+  selectedIds: new Set(ids),
+  setSelectedIds: fn(),
+});
+const ROW_IDS = PRODUCT_ROWS.map((p) => p.id);
 
 const meta = {
   title: 'Pages/Products',
@@ -39,6 +55,11 @@ const meta = {
     onSortChange: fn(),
     onPageChange: fn(),
     onPageSizeChange: fn(),
+    selection: { selectedIds: new Set(), setSelectedIds: fn() },
+    actionReasons: ALL_ALLOWED,
+    onOpenDialog: fn(),
+    onExport: fn(),
+    outcome: '',
   },
 } satisfies Meta<typeof ProductsView>;
 
@@ -121,4 +142,43 @@ export const ArchivedRowsVisible: Story = {
 /** Long text and large numbers: the table scrolls inside its own box, never the page. */
 export const WideData: Story = {
   args: { data: productsPage(WIDE_PRODUCT_ROWS, { total: 12_480 }) },
+};
+
+/** Two rows selected as ADMIN: the bulk bar with every action available. */
+export const BulkSomeSelected: Story = {
+  args: { selection: selected(ROW_IDS.slice(2, 4)) },
+};
+
+/** Every row on the page: the header checkbox is checked. */
+export const BulkAllSelected: Story = {
+  args: { selection: selected(ROW_IDS) },
+};
+
+/** CLERK: Update category and Archive stay visible, disabled with the reason. */
+export const BulkDeniedClerk: Story = {
+  args: {
+    selection: selected(ROW_IDS.slice(2, 4)),
+    actionReasons: {
+      ...ALL_ALLOWED,
+      updateCategory: 'Only an admin can do this',
+      archive: 'Only an admin can do this',
+    },
+  },
+};
+
+/** VIEWER: read-only; Export CSV still works. */
+export const BulkDeniedViewer: Story = {
+  args: {
+    selection: selected(ROW_IDS.slice(2, 3)),
+    actionReasons: {
+      ...ALL_ALLOWED,
+      updateCategory: 'Your role is read-only',
+      archive: 'Your role is read-only',
+    },
+  },
+};
+
+/** After a bulk action: the message above the table, the selection cleared. */
+export const AfterBulkAction: Story = {
+  args: { outcome: '2 products archived' },
 };

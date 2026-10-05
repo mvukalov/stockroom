@@ -1,0 +1,32 @@
+.root {
+  display: inline-flex;
+}
+
+// Fixed to the viewport; RowActionsMenu sets `top` and `left` when it opens.
+.panel {
+  position: fixed;
+  z-index: 1;
+  min-width: 11rem;
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-overlay);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.list {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  justify-content: flex-start;
+  width: 100%;
+}

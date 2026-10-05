@@ -1,13 +1,22 @@
+import { Archive, CircleCheck, Download, FolderInput } from 'lucide-react';
+import type { Ref } from 'react';
+
 import type {
+  Id,
   Page,
   PageSize,
   ProductListItem,
   ProductsQuery,
 } from '@stockroom/contract';
 
+import { Button } from '../../components/atoms/Button/Button';
+import { Icon } from '../../components/atoms/Icon/Icon';
+import type { ColumnDef } from '../../components/organisms/DataTable/columns';
 import { DataTable } from '../../components/organisms/DataTable/DataTable';
+import { RowActionsMenu } from '../../components/organisms/DataTable/RowActionsMenu';
 import { Table } from '../../components/organisms/DataTable/Table';
 import type { ItemNoun } from '../../components/organisms/DataTable/tableContext';
+import type { useRowSelection } from '../../components/organisms/DataTable/useRowSelection';
 import { formatCount } from '../../utils/formatCount';
 import { PRODUCT_COLUMNS } from './productColumns';
 import { productFilterChips, type ProductFilterKey } from './productFilters';
@@ -40,6 +49,16 @@ export function ProductsSummary({ total }: { total: number | undefined }) {
   );
 }
 
+/** The two bulk actions that open a dialog. */
+export type BulkDialogKind = 'category' | 'archive';
+
+/** Why each product action is unavailable to the current user; `undefined` when allowed. */
+export type ProductActionReasons = {
+  updateCategory: string | undefined;
+  archive: string | undefined;
+  export: string | undefined;
+};
+
 export type ProductsViewProps = {
   /** The parsed URL state: filters, sort, page and page size. */
   query: ProductsQuery;
@@ -56,6 +75,22 @@ export type ProductsViewProps = {
   onSortChange: (sort: ProductsQuery['sort']) => void;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: PageSize) => void;
+
+  /** Page-scoped row selection. */
+  selection: ReturnType<typeof useRowSelection>;
+  actionReasons: ProductActionReasons;
+  /** Opens a dialog for these products; `opener` gets focus back when it is cancelled. */
+  onOpenDialog: (
+    kind: BulkDialogKind,
+    ids: Id[],
+    opener: HTMLElement | null,
+  ) => void;
+  /** Export CSV of these rows (the selected rows on this page). */
+  onExport: (rows: ProductListItem[]) => void;
+  /** What the last bulk action did, e.g. "3 products archived"; `''` for nothing. */
+  outcome: string;
+  /** The results area: focused after a bulk action, since the bulk bar is gone then. */
+  resultsRef?: Ref<HTMLElement>;
 };
 
 /** The product list below the page header. Props only; `ProductsPage` picks the state. */
@@ -72,6 +107,12 @@ export function ProductsView({
   onSortChange,
   onPageChange,
   onPageSizeChange,
+  selection,
+  actionReasons,
+  onOpenDialog,
+  onExport,
+  outcome,
+  resultsRef,
 }: ProductsViewProps) {
   const removeFilter = (key: ProductFilterKey) => {
     if (key === 'archived') onFilterChange('archived', false);
@@ -82,39 +123,132 @@ export function ProductsView({
     filterOptions.status === 'ready' ? filterOptions.data : undefined,
   ).map((chip) => ({ ...chip, onRemove: () => removeFilter(chip.id) }));
 
+  const actionsColumn: ColumnDef<ProductListItem, ProductsQuery['sort']> = {
+    id: 'actions',
+    header: 'Actions',
+    hideHeader: true,
+    cell: (product) => (
+      <RowActionsMenu
+        label={`Actions for ${product.title}`}
+        actions={[
+          {
+            id: 'category',
+            label: 'Update category',
+            disabledReason: actionReasons.updateCategory,
+            onSelect: (button) =>
+              onOpenDialog('category', [product.id], button),
+          },
+          // Archiving an archived product would change nothing.
+          ...(product.archivedAt === null
+            ? [
+                {
+                  id: 'archive',
+                  label: 'Archive',
+                  disabledReason: actionReasons.archive,
+                  onSelect: (button: HTMLButtonElement | null) =>
+                    onOpenDialog('archive', [product.id], button),
+                },
+              ]
+            : []),
+        ]}
+      />
+    ),
+  };
+
+  const selectedRows = (selectedIds: ReadonlySet<string>) =>
+    data?.items.filter((product) => selectedIds.has(product.id)) ?? [];
+
   return (
-    <DataTable
-      columns={PRODUCT_COLUMNS}
-      data={data}
-      getRowId={(product) => product.id}
-      getRowLabel={(product) => product.title}
-      caption="Products"
-      itemNoun={PRODUCT_NOUN}
-      sort={query.sort}
-      page={query.page}
-      pageSize={query.pageSize}
-      onSortChange={onSortChange}
-      onPageChange={onPageChange}
-      onPageSizeChange={onPageSizeChange}
-      isFetching={isFetching}
-      error={
-        error === undefined
-          ? undefined
-          : { message: PRODUCTS_LOAD_ERROR, onRetry: error.onRetry }
-      }
-      activeFilters={activeFilters}
-      onClearFilters={onClearFilters}
-      empty={<Table.Empty title="No products yet" />}
-    >
-      <Table.Toolbar>
-        <ProductsToolbar
-          query={query}
-          searchText={searchText}
-          onSearchTextChange={onSearchTextChange}
-          filterOptions={filterOptions}
-          onFilterChange={onFilterChange}
-        />
-      </Table.Toolbar>
-    </DataTable>
+    <>
+      {/* Always mounted, so a new message is announced; empty takes no space. */}
+      <output className={styles.outcome}>
+        {outcome !== '' && (
+          <>
+            <Icon icon={CircleCheck} />
+            {outcome}
+          </>
+        )}
+      </output>
+      <section
+        ref={resultsRef}
+        tabIndex={-1}
+        aria-label="Product results"
+        className={styles.results}
+      >
+        <DataTable
+          columns={[...PRODUCT_COLUMNS, actionsColumn]}
+          data={data}
+          getRowId={(product) => product.id}
+          getRowLabel={(product) => product.title}
+          caption="Products"
+          itemNoun={PRODUCT_NOUN}
+          sort={query.sort}
+          page={query.page}
+          pageSize={query.pageSize}
+          onSortChange={onSortChange}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+          isFetching={isFetching}
+          error={
+            error === undefined
+              ? undefined
+              : { message: PRODUCTS_LOAD_ERROR, onRetry: error.onRetry }
+          }
+          activeFilters={activeFilters}
+          onClearFilters={onClearFilters}
+          empty={<Table.Empty title="No products yet" />}
+          selection={selection}
+        >
+          <Table.Toolbar>
+            <ProductsToolbar
+              query={query}
+              searchText={searchText}
+              onSearchTextChange={onSearchTextChange}
+              filterOptions={filterOptions}
+              onFilterChange={onFilterChange}
+            />
+          </Table.Toolbar>
+          <Table.BulkBar>
+            {({ selectedIds }) => (
+              <>
+                <Button
+                  disabledReason={actionReasons.updateCategory}
+                  onClick={(event) =>
+                    onOpenDialog(
+                      'category',
+                      [...selectedIds],
+                      event.currentTarget,
+                    )
+                  }
+                >
+                  <Icon icon={FolderInput} />
+                  Update category
+                </Button>
+                <Button
+                  disabledReason={actionReasons.archive}
+                  onClick={(event) =>
+                    onOpenDialog(
+                      'archive',
+                      [...selectedIds],
+                      event.currentTarget,
+                    )
+                  }
+                >
+                  <Icon icon={Archive} />
+                  Archive
+                </Button>
+                <Button
+                  disabledReason={actionReasons.export}
+                  onClick={() => onExport(selectedRows(selectedIds))}
+                >
+                  <Icon icon={Download} />
+                  Export CSV
+                </Button>
+              </>
+            )}
+          </Table.BulkBar>
+        </DataTable>
+      </section>
+    </>
   );
 }

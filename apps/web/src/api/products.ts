@@ -1,8 +1,14 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
-import type { Id, ProductsQuery } from '@stockroom/contract';
+import type { BulkProductsInput, Id, ProductsQuery } from '@stockroom/contract';
 
 import { apiRequest, orThrow } from './client';
+import { DASHBOARD_QUERY_KEY } from './dashboard';
 
 /**
  * Prefix of every product list query. The list is the same for every role, so the
@@ -46,5 +52,34 @@ export function useProductFilters(userId: Id | null) {
     enabled: userId !== null,
     // Categories and brands do not change from this screen.
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+export type BulkProductsVariables = {
+  /** The acting user: the server checks the permission against this user. */
+  userId: Id | null;
+  body: BulkProductsInput;
+};
+
+/**
+ * Update category or Archive for a set of products. The result is a `Result`: a
+ * contract error (FORBIDDEN, NOT_FOUND, CONFLICT) is a value the dialog shows, and
+ * only an unexpected failure (network, HTTP 500) puts the mutation in its error
+ * state. Both actions are idempotent, so retrying with the same variables is safe.
+ */
+export function useBulkProducts() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, body }: BulkProductsVariables) =>
+      apiRequest('bulkProducts', { userId, body }),
+    onSuccess: (result) => {
+      if (!result.ok) return;
+      // Returned, so the mutation stays pending until the list on screen has
+      // refetched. Archiving also changes the dashboard's stock figures.
+      return Promise.all([
+        queryClient.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY }),
+        queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY }),
+      ]);
+    },
   });
 }

@@ -78,3 +78,33 @@ export const ProductFilters = z.object({
   brands: z.array(z.string().min(1)),
 });
 export type ProductFilters = z.infer<typeof ProductFilters>;
+
+/** At most one page of the largest page size, so a full page can be sent at once. */
+export const MAX_BULK_PRODUCT_IDS = 100;
+
+const BulkProductIds = z
+  .array(Id)
+  .min(1)
+  .max(MAX_BULK_PRODUCT_IDS)
+  .refine((ids) => new Set(ids).size === ids.length, {
+    message: 'Product ids must be unique',
+  });
+
+/**
+ * Body of `POST /api/products/bulk`. All or nothing: every id changes or none does.
+ * Both actions are idempotent, so a retry after a lost response is safe.
+ */
+export const BulkProductsInput = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('SET_CATEGORY'),
+    ids: BulkProductIds,
+    categoryId: Id,
+  }),
+  z.object({ action: z.literal('ARCHIVE'), ids: BulkProductIds }),
+]);
+export type BulkProductsInput = z.infer<typeof BulkProductsInput>;
+export type BulkProductsAction = BulkProductsInput['action'];
+
+/** Every requested id, including those that already had the requested value. */
+export const BulkProductsResponse = z.object({ updatedIds: z.array(Id) });
+export type BulkProductsResponse = z.infer<typeof BulkProductsResponse>;

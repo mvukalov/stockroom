@@ -1,6 +1,7 @@
 import { SearchX, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 
+import { cx } from '../../../utils/cx';
 import { formatCount } from '../../../utils/formatCount';
 import { Button } from '../../atoms/Button/Button';
 import { IconButton } from '../../atoms/IconButton/IconButton';
@@ -60,7 +61,12 @@ export type BulkSelection = {
   clearSelection: () => void;
 };
 
-/** Bulk actions, shown only while rows are selected. The table knows nothing about the actions. */
+/**
+ * Bulk actions, shown only while rows are selected. The table knows nothing about
+ * the actions. The count is a polite live region (not `role="status"`: the count
+ * row of the pagination is the table's status) that stays mounted, so the bar
+ * appearing and the count changing are announced without moving focus.
+ */
 export function TableBulkBar({
   children,
 }: {
@@ -68,23 +74,27 @@ export function TableBulkBar({
 }) {
   const { itemNoun, selectedIds, clearSelection } =
     useTableContext('Table.BulkBar');
-  if (selectedIds.size === 0) return null;
+  const count = selectedIds.size;
 
   return (
-    <div className={styles.bulkBar}>
-      <span className={styles.bulkCount}>
-        {formatCount(selectedIds.size)} {nounFor(itemNoun, selectedIds.size)}{' '}
-        selected
+    <div className={cx(count > 0 && styles.bulkBar)}>
+      <span aria-live="polite" className={styles.bulkCount}>
+        {count > 0 &&
+          `${formatCount(count)} ${nounFor(itemNoun, count)} selected`}
       </span>
-      <div className={styles.bulkActions}>
-        {children({ selectedIds, clearSelection })}
-      </div>
-      <IconButton
-        icon={X}
-        label="Clear selection"
-        className={styles.bulkClear}
-        onClick={clearSelection}
-      />
+      {count > 0 && (
+        <>
+          <div className={styles.bulkActions}>
+            {children({ selectedIds, clearSelection })}
+          </div>
+          <IconButton
+            icon={X}
+            label="Clear selection"
+            className={styles.bulkClear}
+            onClick={clearSelection}
+          />
+        </>
+      )}
     </div>
   );
 }

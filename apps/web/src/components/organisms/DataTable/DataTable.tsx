@@ -144,12 +144,16 @@ export function DataTable<T, S extends string>({
     clearSelection: () => selection?.setSelectedIds(new Set()),
     activeFilters,
     onClearFilters,
-    columnToggles: columns.map((column) => ({
-      id: column.id,
-      header: column.header,
-      hideable: isHideable(column),
-      visible: visibleColumns.includes(column),
-    })),
+    // A column with a hidden header (e.g. row actions) is not a column the user
+    // thinks of turning off, so the Columns menu leaves it out.
+    columnToggles: columns
+      .filter((column) => column.hideHeader !== true)
+      .map((column) => ({
+        id: column.id,
+        header: column.header,
+        hideable: isHideable(column),
+        visible: visibleColumns.includes(column),
+      })),
     toggleColumn: (id) => {
       const next = new Set(hiddenColumns);
       if (next.has(id)) next.delete(id);
