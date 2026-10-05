@@ -1,0 +1,57 @@
+@use '../../../styles/mixins';
+
+.card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface);
+}
+
+.label {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+}
+
+// Tested pair: --color-warning on --color-warning-bg. The negative margin keeps the
+// label row as tall as on the other cards, so the values line up.
+.toneIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-block: calc(-1 * var(--space-1));
+  padding: var(--space-1);
+  border-radius: var(--radius-badge);
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.warning {
+  border-color: var(--color-warning);
+}
+
+// `1lh` keeps a skeleton line as tall as a line of text: no jump when data arrives.
+.value {
+  @include mixins.tabular-nums;
+
+  min-height: 1lh;
+
+  color: var(--color-text);
+  font-size: var(--font-size-kpi);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.caption {
+  min-height: 1lh;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-body);
+}

@@ -1,0 +1,9 @@
+// Named container: KpiGrid re-flows by this width, not the viewport.
+.dashboard {
+  container: dashboard / inline-size;
+}
+
+.content {
+  display: grid;
+  gap: var(--space-6);
+}

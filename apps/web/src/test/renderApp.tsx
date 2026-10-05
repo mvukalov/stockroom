@@ -11,17 +11,16 @@ import { appRoutes } from '../app/router';
 /** Renders `children` with the app providers and a client that never retries. */
 export function renderWithProviders(children: ReactNode) {
   const user = userEvent.setup();
-  render(
-    <AppProviders queryClient={createQueryClient({ retry: false })}>
-      {children}
-    </AppProviders>,
-  );
-  return { user };
+  const queryClient = createQueryClient({ retry: false });
+  render(<AppProviders queryClient={queryClient}>{children}</AppProviders>);
+  return { user, queryClient };
 }
 
 /** The whole app (real route config) in a memory router at `path`. */
 export function renderApp(path: string = '/dashboard') {
   const router = createMemoryRouter(appRoutes, { initialEntries: [path] });
-  const { user } = renderWithProviders(<RouterProvider router={router} />);
-  return { router, user };
+  const { user, queryClient } = renderWithProviders(
+    <RouterProvider router={router} />,
+  );
+  return { router, user, queryClient };
 }

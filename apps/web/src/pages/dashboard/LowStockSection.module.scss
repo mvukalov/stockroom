@@ -1,0 +1,119 @@
+@use '../../styles/mixins';
+
+.section {
+  min-width: 0;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-4);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.heading {
+  font-size: var(--font-size-section-title);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.count {
+  @include mixins.tabular-nums;
+
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+
+.countSkeleton {
+  align-self: center;
+  font-size: var(--font-size-caption);
+}
+
+.link {
+  margin-inline-start: auto;
+  color: var(--color-accent);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+
+  &:hover {
+    color: var(--color-accent-hover);
+  }
+}
+
+// The table scrolls inside its own box; the page never scrolls sideways.
+.scroller {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+  font-size: var(--font-size-table-cell);
+
+  th,
+  td {
+    padding: var(--space-2) var(--space-4);
+    text-align: start;
+    vertical-align: middle;
+  }
+
+  th {
+    height: var(--table-row-height);
+    border-bottom: var(--border-width) solid var(--color-border);
+    background-color: var(--color-surface-subtle);
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+  }
+
+  td {
+    height: var(--table-row-height);
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .number {
+    @include mixins.tabular-nums;
+
+    text-align: end;
+  }
+}
+
+.title {
+  display: block;
+  min-height: 1lh;
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.sku {
+  display: block;
+  min-height: 1lh;
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+}
+
+.numberSkeleton {
+  margin-inline-start: auto;
+}
+
+.footer {
+  @include mixins.tabular-nums;
+
+  padding: var(--space-3) var(--space-4);
+  border-top: var(--border-width) solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
