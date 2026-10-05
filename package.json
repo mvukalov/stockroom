@@ -9,7 +9,9 @@
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "storybook": "pnpm --filter @stockroom/web storybook",
+    "build-storybook": "pnpm --filter @stockroom/web build-storybook"
   },
   "devDependencies": {
     "prettier": "^3.9.9"

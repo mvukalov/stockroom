@@ -1,5 +1,7 @@
 node_modules
 dist
+storybook-static
+.playwright-mcp/
 .DS_Store
 *.log
 *.local
