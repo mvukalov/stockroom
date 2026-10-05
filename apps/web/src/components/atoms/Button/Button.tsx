@@ -13,7 +13,7 @@ export type ButtonProps = ComponentPropsWithRef<'button'> & {
    * stays focusable and announces the reason, but ignores clicks. Use it
    * instead of `disabled` whenever the user should learn why.
    */
-  disabledReason?: string;
+  disabledReason?: string | undefined;
 };
 
 export function Button({

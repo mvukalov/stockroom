@@ -287,6 +287,27 @@ describe('selection', () => {
     expect(screen.queryByText(/selected$/)).not.toBeInTheDocument();
   });
 
+  it('announces the count in a live region that stays mounted', async () => {
+    const { user } = renderHarness();
+
+    // Mounted before anything is selected, so the first count is announced.
+    const live = document.querySelector('[aria-live="polite"]:empty');
+    expect(live).not.toBeNull();
+
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Select SHP-2026-1000' }),
+    );
+    expect(live).toHaveTextContent('1 shipment selected');
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Select SHP-2026-1001' }),
+    );
+    expect(live).toHaveTextContent('2 shipments selected');
+    // Selecting moved no focus to the bar.
+    expect(
+      screen.getByRole('checkbox', { name: 'Select SHP-2026-1001' }),
+    ).toHaveFocus();
+  });
+
   it('uses the singular for one row and clears from the bulk bar', async () => {
     const { user } = renderHarness();
 
@@ -492,6 +513,36 @@ describe('column visibility', () => {
 
     await user.click(within(panel).getByRole('checkbox', { name: 'Carrier' }));
     expect(screen.getByRole('columnheader', { name: /Carrier/ })).toBeVisible();
+  });
+
+  it('leaves out columns with a hidden header', async () => {
+    const { user } = renderTable(
+      {
+        columns: [
+          ...SHIPMENT_COLUMNS,
+          {
+            id: 'actions',
+            header: 'Actions',
+            hideHeader: true,
+            cell: () => null,
+          },
+        ],
+      },
+      <Table.Toolbar />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Columns' }));
+    const panel = screen.getByRole('group', { name: 'Visible columns' });
+    expect(
+      within(panel).queryByRole('checkbox', { name: 'Actions' }),
+    ).not.toBeInTheDocument();
+    expect(within(panel).getAllByRole('checkbox')).toHaveLength(
+      SHIPMENT_COLUMNS.length,
+    );
+    // The column itself is still shown.
+    expect(
+      screen.getByRole('columnheader', { name: 'Actions' }),
+    ).toBeInTheDocument();
   });
 
   it('closes on Escape and returns focus to the button', async () => {
