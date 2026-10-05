@@ -1,0 +1,306 @@
+@use '../../../styles/mixins';
+
+// `isolation` keeps the z-index of the Columns panel and the progress bar inside
+// the table, so they never paint over the sticky top bar.
+.root {
+  isolation: isolate;
+  min-width: 0;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface);
+}
+
+// Toolbar: caller filters on the start side, Columns and Clear filters at the end.
+.toolbar {
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.toolbarRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+
+.filters {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.toolbarEnd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-inline-start: auto;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-top: var(--border-width) solid var(--color-border);
+  background-color: var(--color-surface-subtle);
+  font-size: var(--font-size-caption);
+}
+
+.chipsLabel {
+  color: var(--color-text-muted);
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--badge-height);
+  padding-inline-start: var(--space-2);
+  border: var(--border-width) solid var(--color-border-control);
+  border-radius: var(--radius-badge);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+// Smaller than a row action, but never below the 24 px minimum target.
+.chipRemove {
+  width: var(--target-size-min);
+  min-width: var(--target-size-min);
+  height: var(--target-size-min);
+}
+
+// Columns menu: a disclosure panel under its button.
+.columnsMenu {
+  position: relative;
+}
+
+.columnsPanel {
+  position: absolute;
+  z-index: 1;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  min-width: 12rem;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-overlay);
+  font-size: var(--font-size-body);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.columnsFieldset {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.bulkBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+  background-color: var(--color-info-bg);
+}
+
+.bulkCount {
+  @include mixins.tabular-nums;
+
+  color: var(--color-info);
+  font-weight: var(--font-weight-semibold);
+}
+
+.bulkActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.bulkClear {
+  margin-inline-start: auto;
+}
+
+// Table area. The progress bar sits on its top edge, so showing it never moves the rows.
+.body {
+  position: relative;
+}
+
+.message {
+  padding: var(--space-3);
+}
+
+.progress {
+  position: absolute;
+  z-index: 1;
+  inset-inline: 0;
+  top: 0;
+  height: calc(var(--border-width) * 2);
+  overflow: hidden;
+  background-color: var(--color-nav-active-bg);
+}
+
+// A third of the width slides across. With reduced motion it is a full, still bar.
+.progressBar {
+  display: block;
+  width: 33%;
+  height: 100%;
+  background-color: var(--color-accent);
+  animation: progress var(--duration-skeleton) var(--easing-standard) infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    width: 100%;
+    animation: none;
+  }
+}
+
+@keyframes progress {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(300%);
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-table-cell);
+
+  th,
+  td {
+    height: var(--table-row-height);
+    padding: var(--space-2) var(--space-3);
+    border-bottom: var(--border-width) solid var(--color-border);
+    text-align: start;
+    vertical-align: middle;
+  }
+
+  th {
+    background-color: var(--color-surface-subtle);
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+  }
+
+  td {
+    color: var(--color-text);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .end {
+    @include mixins.tabular-nums;
+
+    text-align: end;
+  }
+}
+
+// Codes and references never wrap mid-code; a long one widens the column instead.
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  white-space: nowrap;
+}
+
+.selected td {
+  background-color: var(--color-surface-subtle);
+}
+
+.selectCell {
+  width: 1%;
+  padding-inline-end: 0;
+}
+
+// Fills the header cell so the whole cell is the click target.
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--target-size-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.sortIcon {
+  color: var(--color-text-subtle);
+}
+
+.sortIconActive {
+  color: var(--color-text);
+}
+
+.endSkeleton {
+  margin-inline-start: auto;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border-top: var(--border-width) solid var(--color-border);
+  font-size: var(--font-size-body);
+}
+
+.status {
+  @include mixins.tabular-nums;
+
+  color: var(--color-text-muted);
+}
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pageSizeLabel {
+  color: var(--color-text-muted);
+}
+
+.pageSize {
+  width: auto;
+}
+
+.pageOf {
+  @include mixins.tabular-nums;
+
+  margin-inline: var(--space-2);
+  color: var(--color-text-muted);
+}
