@@ -8,7 +8,7 @@ Read first: `context/coding-standards.md` (Routing, Styling, Accessibility, Nami
 
 ## Goals
 
-- [ ] React Router v7 in data mode (`createBrowserRouter`, ADR-0001). Route paths are constants in one file, with a typed helper for the order detail path. Routes: `/` redirects to `/dashboard`; `/dashboard`, `/products`, `/movements`, `/orders`, `/orders/:id`, `/audit`; anything else shows a "Page not found" page inside the shell.
+- [ ] React Router v8 in data mode (`createBrowserRouter`, ADR-0001). Route paths are constants in one file, with a typed helper for the order detail path. Routes: `/` redirects to `/dashboard`; `/dashboard`, `/products`, `/movements`, `/orders`, `/orders/:id`, `/audit`; anything else shows a "Page not found" page inside the shell.
 - [ ] Layout: a skip link, a `<nav aria-label="Main">` sidebar, a `<header>` top bar and one `<main>`. Desktop sidebar is 240 px and collapses to an icon-only rail; the collapsed state survives reload.
 - [ ] Sidebar items in this order: Dashboard, Products, Movements, Orders, Audit log, each with a Lucide icon. The active item has `aria-current="page"` and a visible non-colour cue. In the collapsed rail every item still has an accessible name.
 - [ ] Below 768 px the sidebar is hidden and opens as a modal drawer from a menu button in the top bar. It traps focus, closes on Escape, on backdrop click and on navigation, and returns focus to the menu button.
@@ -42,7 +42,7 @@ Read first: `context/coding-standards.md` (Routing, Styling, Accessibility, Nami
 
 ## Notes
 
-- New libraries: `react-router` (v7) and `@tanstack/react-query`. Ask before adding anything else, and check the current official docs for both rather than relying on memory.
+- New libraries: `react-router` (v8) and `@tanstack/react-query`. Ask before adding anything else, and check the current official docs for both rather than relying on memory.
 - Suggested structure, to be confirmed in the plan: router and providers in `src/app/`, shared layout components in `src/components/organisms/` (`AppShell`, `Sidebar`, `TopBar`, `RoleSwitcher`), pages in `src/pages/`, the API client in `src/api/`. Co-locate `.module.scss`, `.test.tsx` and `.stories.tsx`.
 - `main.tsx` keeps the MSW bootstrap exactly as it is; only the rendered root changes. The mock must stay out of `VITE_API_MODE=real` builds.
 - `GET /api/users` should not need an identity (verify in the handler); if it does, report it instead of working around it.

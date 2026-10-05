@@ -30,7 +30,7 @@
 
 ## Routing
 
-- React Router v7 data mode (ADR-0001). Route paths are constants.
+- React Router v8 data mode (ADR-0001). Route paths are constants.
 - Table filters, sort and page live in the URL and are parsed with a contract Zod schema. Invalid params fall back to defaults.
 
 ## Styling
