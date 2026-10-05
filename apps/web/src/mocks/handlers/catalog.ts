@@ -1,7 +1,7 @@
 import { ENDPOINTS, StockStatus } from '@stockroom/contract';
 
 import { authorize, parseQuery, respond } from '../http';
-import { matchesText, paginate, sortBy } from '../listing';
+import { compareNames, matchesText, paginate, sortBy } from '../listing';
 import { toDashboard, toProductListItem } from '../readModels';
 import { route } from '../route';
 
@@ -50,5 +50,24 @@ export const catalogHandlers = [
       stockStatus: (p) => StockStatus.options.indexOf(p.stockStatus),
     });
     return respond(ENDPOINTS.listProducts.response, paginate(sorted, query));
+  }),
+
+  // Registered with the other `/api/products` routes; a future `/api/products/:id`
+  // must come after it (see `ENDPOINTS.listProductFilters`).
+  route('listProductFilters', ({ request, db }) => {
+    const user = authorize(request, db, 'view');
+    if (!user.ok) return user.error;
+
+    // Every product, archived included: "Show archived" can list them too.
+    const brands = [...new Set(db.products.map((p) => p.brand))].sort(
+      compareNames,
+    );
+    const categories = [...db.categories].sort((a, b) =>
+      compareNames(a.name, b.name),
+    );
+    return respond(ENDPOINTS.listProductFilters.response, {
+      categories,
+      brands,
+    });
   }),
 ];

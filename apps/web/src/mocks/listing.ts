@@ -56,3 +56,14 @@ export function matchesText(
   const needle = search.toLowerCase();
   return values.some((value) => value.toLowerCase().includes(needle));
 }
+
+/**
+ * Case- and accent-insensitive order for names shown as options (`en` collation),
+ * with a code-unit tie-break so the order is total and stable.
+ */
+export function compareNames(a: string, b: string): number {
+  return (
+    a.localeCompare(b, 'en', { sensitivity: 'base' }) ||
+    (a < b ? -1 : a > b ? 1 : 0)
+  );
+}

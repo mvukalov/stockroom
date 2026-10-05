@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { AuditLogEntry } from './audit';
-import { ProductListItem } from './catalog';
+import { ProductFilters, ProductListItem } from './catalog';
 import { DashboardResponse } from './dashboard';
 import {
   CreateMovementInput,
@@ -59,6 +59,13 @@ export const ENDPOINTS = {
     path: '/api/products',
     query: ProductsQuery,
     response: pageSchema(ProductListItem),
+  },
+  // A fixed segment under `/api/products`: register it before any future
+  // `/api/products/:id`, or `filters` would be read as a product id.
+  listProductFilters: {
+    method: 'GET',
+    path: '/api/products/filters',
+    response: ProductFilters,
   },
   listMovements: {
     method: 'GET',
