@@ -30,3 +30,21 @@
   color: var(--color-text);
   font-weight: var(--font-weight-medium);
 }
+
+// The outcome of the last bulk action, above the table. Empty, it takes no space.
+.outcome {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-success);
+  font-weight: var(--font-weight-medium);
+
+  &:not(:empty) {
+    margin-bottom: var(--space-3);
+  }
+}
+
+// Focus target after a bulk action; it holds the toolbar, bulk bar and table.
+.results {
+  border-radius: var(--radius-card);
+}
