@@ -4,7 +4,7 @@ Draft: the number is provisional; renumber to the next free number when this spe
 
 Feature 005, part 2 of 2. The Products screen on top of `DataTable<T>`: URL-synced filters, status badges, bulk selection with bulk actions, and the loading, empty and error states from the prototype.
 
-Depends on: `005_01-data-table-spec.md`, feature 001 (contract, domain, seed, MSW handlers), the app shell (shell, router, permission hook).
+Depends on: `002_05-data-table-spec.md`, feature 001 (contract, domain, seed, MSW handlers), the app shell (shell, router, permission hook).
 
 Read first: `context/project-overview.md` (domain rules, permissions), ADR-0003, ADR-0004, `context/design/tokens.md`, screenshots `context/design/02-products-*.png`.
 
