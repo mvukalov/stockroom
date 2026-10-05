@@ -1,0 +1,36 @@
+// Tested pair: --color-danger on --color-danger-bg.
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--color-danger);
+  border-radius: var(--radius-card);
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.icon {
+  align-self: flex-start;
+  margin-top: 0.15em;
+}
+
+.text {
+  display: grid;
+  flex: 1 1 16rem;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.message {
+  font-weight: var(--font-weight-medium);
+}
+
+.description {
+  font-size: var(--font-size-caption);
+}
+
+.action {
+  flex-shrink: 0;
+}
