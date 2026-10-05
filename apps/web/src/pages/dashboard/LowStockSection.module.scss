@@ -47,11 +47,6 @@
   }
 }
 
-// The table scrolls inside its own box; the page never scrolls sideways.
-.scroller {
-  overflow-x: auto;
-}
-
 .table {
   width: 100%;
   min-width: 32rem;

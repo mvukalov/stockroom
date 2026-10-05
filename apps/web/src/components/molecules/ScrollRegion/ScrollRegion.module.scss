@@ -1,0 +1,8 @@
+// The content scrolls inside its own box; the page never scrolls sideways.
+// `position: relative` makes the region the containing block of positioned content
+// (e.g. a visually hidden caption centred over a wide table), so that content is
+// clipped here too instead of widening the page.
+.region {
+  position: relative;
+  overflow-x: auto;
+}
