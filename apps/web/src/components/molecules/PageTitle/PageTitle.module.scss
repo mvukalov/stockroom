@@ -12,3 +12,15 @@
   font-size: var(--font-size-page-title);
   overflow-wrap: anywhere;
 }
+
+.titleBlock {
+  min-width: 0;
+}
+
+.details {
+  display: grid;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+}

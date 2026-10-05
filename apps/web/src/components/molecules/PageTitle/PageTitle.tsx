@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { APP_NAME } from '../../../app/pageTitle';
 import styles from './PageTitle.module.scss';
 
@@ -6,15 +8,33 @@ import styles from './PageTitle.module.scss';
  * a route change (AppShell), hence `tabIndex={-1}`. Pages use `PageHeader`, which
  * reads the title from the route; this takes it directly for pages outside a route
  * (error page) and for stories.
+ *
+ * `children` go under the `<h1>`, e.g. a short description and a result count.
  */
-export function PageTitle({ title }: { title: string }) {
+export function PageTitle({
+  title,
+  children,
+}: {
+  title: string;
+  children?: ReactNode;
+}) {
+  const heading = (
+    <h1 tabIndex={-1} className={styles.heading}>
+      {title}
+    </h1>
+  );
   return (
     <div className={styles.row}>
       {/* React 19 hoists <title> into <head>. */}
       <title>{`${title} · ${APP_NAME}`}</title>
-      <h1 tabIndex={-1} className={styles.heading}>
-        {title}
-      </h1>
+      {children === undefined ? (
+        heading
+      ) : (
+        <div className={styles.titleBlock}>
+          {heading}
+          <div className={styles.details}>{children}</div>
+        </div>
+      )}
     </div>
   );
 }
