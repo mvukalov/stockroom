@@ -1,7 +1,12 @@
 import { z } from 'zod';
 
 import { AuditLogEntry } from './audit';
-import { ProductFilters, ProductListItem } from './catalog';
+import {
+  BulkProductsInput,
+  BulkProductsResponse,
+  ProductFilters,
+  ProductListItem,
+} from './catalog';
 import { DashboardResponse } from './dashboard';
 import {
   CreateMovementInput,
@@ -66,6 +71,14 @@ export const ENDPOINTS = {
     method: 'GET',
     path: '/api/products/filters',
     response: ProductFilters,
+  },
+  // Also a fixed segment, registered before any future `/api/products/:id`.
+  // All or nothing, idempotent: see `BulkProductsInput`.
+  bulkProducts: {
+    method: 'POST',
+    path: '/api/products/bulk',
+    body: BulkProductsInput,
+    response: BulkProductsResponse,
   },
   listMovements: {
     method: 'GET',
