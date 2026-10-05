@@ -1,0 +1,55 @@
+@use '../../../styles/mixins';
+
+.topBar {
+  container-type: inline-size;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--topbar-height);
+  padding-inline: var(--space-4);
+  border-bottom: var(--border-width) solid var(--color-border);
+  background-color: var(--color-surface);
+
+  @include mixins.from-md {
+    padding-inline: var(--space-6);
+  }
+}
+
+// The menu button opens the drawer, which only exists below 768 px.
+.menu {
+  display: inline-flex;
+  flex-shrink: 0;
+
+  @include mixins.from-md {
+    display: none;
+  }
+}
+
+.title {
+  // Sized from its content like the role switcher, so on a narrow screen both
+  // shrink instead of the switcher pushing the title out.
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-page-title);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Shown only when the top bar itself is at least 768 px wide: at a 768 px viewport
+// the sidebar takes 240 px and the placeholder would squeeze the title and the
+// role switcher.
+.search {
+  display: none;
+  flex: 0 1 18rem;
+  min-width: 0;
+
+  @container (min-width: #{mixins.$breakpoint-md}) {
+    display: block;
+  }
+}

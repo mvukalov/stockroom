@@ -35,3 +35,15 @@
     cursor: not-allowed;
   }
 }
+
+// Layout breakpoint (768 px): below it the sidebar becomes a drawer. Media queries
+// cannot read custom properties, so the breakpoint lives here. Mirrored for scripts
+// as `MEDIA_FROM_MD` in breakpoints.ts.
+$breakpoint-md: 48rem;
+
+// Mobile first: styles inside apply from 768 px up.
+@mixin from-md {
+  @media (min-width: $breakpoint-md) {
+    @content;
+  }
+}

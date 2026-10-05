@@ -1,0 +1,45 @@
+@use '../../../styles/mixins';
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+// Takes the remaining width; min-width: 0 lets wide content scroll inside it
+// instead of scrolling the page horizontally.
+.column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.main {
+  flex: 1;
+  padding: var(--space-4);
+
+  @include mixins.from-md {
+    padding: var(--space-6) var(--space-8);
+  }
+}
+
+// Off-screen until focused, then shown over the top-left corner.
+.skipLink {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 2;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+  transform: translateY(calc(-100% - var(--space-4)));
+
+  // The shadow only while shown, or its blur shows at the top edge.
+  &:focus {
+    box-shadow: var(--shadow-overlay);
+    transform: none;
+  }
+}
