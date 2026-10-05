@@ -1,0 +1,51 @@
+@use '../../../styles/mixins';
+
+.switcher {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+// Always visible: the control is a demo device, not a login.
+.label {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+// Avatar and badge repeat what the selected option already says, so narrow
+// viewports drop them to keep the top bar on one line.
+.avatar,
+.badge {
+  display: none;
+
+  @include mixins.from-md {
+    display: inline-flex;
+  }
+}
+
+.select {
+  flex: 0 1 auto;
+  width: auto;
+  // Shrinks with the page title on a narrow screen, but never so far that the
+  // selected name cannot be read. The full name and role are in the open list.
+  min-width: 7rem;
+}
+
+.loadingName {
+  flex-shrink: 0;
+}
+
+.empty {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  white-space: nowrap;
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: var(--font-size-caption);
+  white-space: nowrap;
+}

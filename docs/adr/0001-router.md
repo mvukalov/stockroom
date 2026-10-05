@@ -23,3 +23,7 @@ Typed search params are recovered without a second router: filters are read from
 - Positive: the most recognisable choice, one fewer thing to explain, typed filters through the existing contract.
 - Negative: no compile-time check of route paths and params. Mitigation: route path constants and small typed helpers in `apps/web`.
 - Revisit only if route-level type safety becomes a real source of bugs.
+
+## Amendment (2026-10-05)
+
+Pinned to the current major, React Router v8, as of 2026-10-05. Data mode is unchanged; `RouterProvider` is imported from `react-router/dom` (the separate `react-router-dom` package was removed in v8).

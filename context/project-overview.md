@@ -30,7 +30,7 @@ Language: English only (UI, content, code, docs, commits).
 | Language | TypeScript, strict | |
 | UI | React 19 + Vite | |
 | Monorepo | pnpm workspaces | |
-| Routing | React Router v7, library/data mode (not framework mode) | ADR-0001 |
+| Routing | React Router v8, library/data mode (not framework mode) | ADR-0001 |
 | Server state | TanStack Query | ADR-0002 |
 | Client state | Redux Toolkit (event-flow state only) | ADR-0002 |
 | Forms and validation | react-hook-form + Zod | |

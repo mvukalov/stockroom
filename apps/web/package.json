@@ -19,9 +19,11 @@
     "@stockroom/contract": "workspace:*",
     "@stockroom/domain": "workspace:*",
     "@stockroom/seed": "workspace:*",
+    "@tanstack/react-query": "^5.104.1",
     "lucide-react": "^1.51.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-router": "^8.4.0"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "10.6.1",

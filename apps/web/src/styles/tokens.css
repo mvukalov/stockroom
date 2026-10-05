@@ -88,6 +88,11 @@
   --icon-size-md: 1rem; /* 16: controls */
   --table-row-height: 2.5rem; /* 40 */
 
+  /* Layout: the only fixed widths in the app */
+  --sidebar-width: 15rem; /* 240 */
+  --sidebar-width-collapsed: 3.5rem; /* 56: icon rail */
+  --topbar-height: 3.5rem; /* 56 */
+
   /* Focus ring */
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
@@ -95,6 +100,8 @@
   /* Elevation: one soft shadow for drawers, modals and toasts */
   --shadow-overlay:
     0 8px 24px rgb(17 24 39 / 0.12), 0 2px 6px rgb(17 24 39 / 0.08);
+  /* Dims the page behind a modal drawer or dialog */
+  --overlay-backdrop: rgb(17 24 39 / 0.4);
 
   /* Motion */
   --duration-fast: 120ms;

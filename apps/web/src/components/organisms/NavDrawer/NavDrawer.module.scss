@@ -1,0 +1,40 @@
+// Full-height panel on the left. Leaves a strip of backdrop visible even at 375 px.
+.drawer {
+  width: min(var(--sidebar-width), calc(100vw - var(--space-12)));
+  max-width: none;
+  height: 100vh;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-overlay);
+
+  &::backdrop {
+    background-color: var(--overlay-backdrop);
+  }
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: var(--topbar-height);
+  padding-inline: var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2);
+}

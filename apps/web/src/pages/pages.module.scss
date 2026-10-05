@@ -1,0 +1,44 @@
+// Shared by the placeholder, not-found and error pages.
+
+.panel {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-12) var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  text-align: center;
+
+  p {
+    max-width: 40em;
+  }
+}
+
+.icon {
+  color: var(--color-text-subtle);
+}
+
+.panelTitle {
+  color: var(--color-text);
+  font-size: var(--font-size-section-title);
+  font-weight: var(--font-weight-semibold);
+}
+
+.code {
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.action {
+  margin-top: var(--space-2);
+  color: var(--color-accent);
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+
+  &:hover {
+    color: var(--color-accent-hover);
+  }
+}

@@ -1,0 +1,56 @@
+.list {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--control-height);
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-control);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: background-color var(--duration-fast) var(--easing-standard);
+
+  &:hover {
+    background-color: var(--color-surface-subtle);
+    color: var(--color-text);
+  }
+}
+
+// Active: tinted background plus two cues that do not rely on colour, a bar on the
+// leading edge and a heavier label.
+.active,
+.active:hover {
+  background-color: var(--color-nav-active-bg);
+  color: var(--color-nav-active-text);
+  font-weight: var(--font-weight-semibold);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-block: var(--space-1);
+    left: 0;
+    width: var(--space-1);
+    border-radius: var(--radius-round);
+    background-color: currentColor;
+  }
+}
+
+.collapsed {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
