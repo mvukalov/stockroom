@@ -10,6 +10,7 @@ import {
   type Id,
   type Order,
   type OrderStatus,
+  type Product,
   type Role,
   type User,
 } from '@stockroom/contract';
@@ -21,6 +22,7 @@ import {
   SLOW_LATENCY,
 } from './config';
 import { getDb, resetDb } from './db';
+import { archiveConflictMessage } from './handlers/catalog';
 import { latencyMs, respond } from './http';
 import { compareNames } from './listing';
 import { server } from './node';
@@ -235,6 +237,288 @@ describe('GET /api/products/filters', () => {
       403,
       'FORBIDDEN',
     );
+  });
+});
+
+describe('POST /api/products/bulk', () => {
+  const BULK = '/api/products/bulk';
+
+  /** Active products nothing reserves, so archiving them is allowed. */
+  function archivable(count: number): Product[] {
+    const db = getDb();
+    const found = db.products
+      .filter(
+        (p) => p.archivedAt === null && availabilityOf(db, p.id).reserved === 0,
+      )
+      .slice(0, count);
+    if (found.length < count)
+      throw new Error(`Seed has fewer than ${count} archivable products`);
+    return found;
+  }
+
+  function reservedProduct(): Product {
+    const db = getDb();
+    const product = db.products.find(
+      (p) => p.archivedAt === null && availabilityOf(db, p.id).reserved > 0,
+    );
+    if (!product) throw new Error('Seed has no reserved product');
+    return product;
+  }
+
+  /** A category none of `products` is in. */
+  function otherCategory(products: readonly Product[]) {
+    const category = getDb().categories.find(
+      (c) => !products.some((p) => p.categoryId === c.id),
+    );
+    if (!category) throw new Error('Seed has no spare category');
+    return category;
+  }
+
+  const stored = (id: Id) => getDb().productById.get(id);
+
+  async function listed(search: string, archived = false) {
+    const result = await call(
+      `/api/products?search=${encodeURIComponent(search)}&archived=${archived}`,
+    );
+    return ENDPOINTS.listProducts.response.parse(result.body).items;
+  }
+
+  it('moves products to another category as ADMIN and the list shows it', async () => {
+    const products = archivable(2);
+    const category = otherCategory(products);
+    const ids = products.map((p) => p.id);
+
+    const result = await call(BULK, {
+      method: 'POST',
+      body: { action: 'SET_CATEGORY', ids, categoryId: category.id },
+    });
+
+    expect(result.status).toBe(200);
+    expect(ENDPOINTS.bulkProducts.response.parse(result.body)).toEqual({
+      updatedIds: ids,
+    });
+    for (const product of products) {
+      expect(stored(product.id)?.categoryId).toBe(category.id);
+      const [row] = await listed(product.sku);
+      expect(row?.categoryName).toBe(category.name);
+    }
+  });
+
+  it('archives products as ADMIN; the list hides them unless archived ones are asked for', async () => {
+    const products = archivable(2);
+    const ids = products.map((p) => p.id);
+
+    const result = await call(BULK, {
+      method: 'POST',
+      body: { action: 'ARCHIVE', ids },
+    });
+
+    expect(result.status).toBe(200);
+    expect(ENDPOINTS.bulkProducts.response.parse(result.body)).toEqual({
+      updatedIds: ids,
+    });
+    for (const product of products) {
+      expect(stored(product.id)?.archivedAt).not.toBeNull();
+      expect(await listed(product.sku)).toEqual([]);
+      expect((await listed(product.sku, true)).map((p) => p.id)).toEqual([
+        product.id,
+      ]);
+    }
+  });
+
+  it.each([
+    ['CLERK', 'Only an admin can do this'],
+    ['VIEWER', 'Your role is read-only'],
+  ] as const)(
+    'forbids both actions for %s and changes nothing',
+    async (role, reason) => {
+      const [product] = archivable(1);
+      if (!product) throw new Error('unreachable');
+      const category = otherCategory([product]);
+
+      for (const body of [
+        { action: 'ARCHIVE', ids: [product.id] },
+        { action: 'SET_CATEGORY', ids: [product.id], categoryId: category.id },
+      ]) {
+        const result = await call(BULK, { method: 'POST', as: role, body });
+        expect(expectError(result, 403, 'FORBIDDEN').message).toBe(reason);
+      }
+      expect(stored(product.id)).toBe(product);
+    },
+  );
+
+  it('refuses an unknown product with NOT_FOUND and changes none of the others', async () => {
+    const [product] = archivable(1);
+    if (!product) throw new Error('unreachable');
+    const unknown = newId();
+
+    const result = await call(BULK, {
+      method: 'POST',
+      body: { action: 'ARCHIVE', ids: [product.id, unknown] },
+    });
+
+    expect(expectError(result, 404, 'NOT_FOUND').message).toContain(unknown);
+    expect(stored(product.id)).toBe(product);
+  });
+
+  it('refuses an unknown category with NOT_FOUND and changes nothing', async () => {
+    const [product] = archivable(1);
+    if (!product) throw new Error('unreachable');
+
+    const result = await call(BULK, {
+      method: 'POST',
+      body: { action: 'SET_CATEGORY', ids: [product.id], categoryId: newId() },
+    });
+
+    expectError(result, 404, 'NOT_FOUND');
+    expect(stored(product.id)).toBe(product);
+  });
+
+  it('refuses to archive a reserved product with CONFLICT naming it, and archives nothing', async () => {
+    const reserved = reservedProduct();
+    const [free] = archivable(1);
+    if (!free) throw new Error('unreachable');
+
+    const result = await call(BULK, {
+      method: 'POST',
+      body: { action: 'ARCHIVE', ids: [free.id, reserved.id] },
+    });
+
+    expect(expectError(result, 409, 'CONFLICT').message).toBe(
+      archiveConflictMessage([reserved.sku]),
+    );
+    expect(stored(free.id)).toBe(free);
+    expect(stored(reserved.id)).toBe(reserved);
+  });
+
+  it('answers a repeated request the same way and keeps the first archive date', async () => {
+    const products = archivable(2);
+    const ids = products.map((p) => p.id);
+    const category = otherCategory(products);
+    const archive = { action: 'ARCHIVE', ids };
+    const move = { action: 'SET_CATEGORY', ids, categoryId: category.id };
+
+    expect((await call(BULK, { method: 'POST', body: move })).status).toBe(200);
+    const again = await call(BULK, { method: 'POST', body: move });
+    expect(again.status).toBe(200);
+    expect(again.body).toEqual({ updatedIds: ids });
+
+    expect((await call(BULK, { method: 'POST', body: archive })).status).toBe(
+      200,
+    );
+    const firstDates = ids.map((id) => stored(id)?.archivedAt);
+    const repeat = await call(BULK, { method: 'POST', body: archive });
+    expect(repeat.status).toBe(200);
+    expect(repeat.body).toEqual({ updatedIds: ids });
+    expect(ids.map((id) => stored(id)?.archivedAt)).toEqual(firstDates);
+  });
+
+  it('rejects an invalid body with VALIDATION_FAILED', async () => {
+    const result = await call(BULK, {
+      method: 'POST',
+      body: { action: 'ARCHIVE', ids: [] },
+    });
+    expectError(result, 400, 'VALIDATION_FAILED');
+  });
+
+  describe('a body without a readable action', () => {
+    async function postRaw(body: string, as: Role | null) {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (as !== null) headers[USER_ID_HEADER] = userWith(as).id;
+      const response = await fetch(`${BASE}${BULK}`, {
+        method: 'POST',
+        headers,
+        body,
+      });
+      return {
+        status: response.status,
+        body: (await response.json()) as unknown,
+      };
+    }
+
+    it.each(['CLERK', 'VIEWER'] as const)(
+      'is VALIDATION_FAILED for %s: only the user is checked',
+      async (role) => {
+        expectError(await postRaw('{not json', role), 400, 'VALIDATION_FAILED');
+        expectError(
+          await postRaw(JSON.stringify({ ids: [newId()] }), role),
+          400,
+          'VALIDATION_FAILED',
+        );
+        expectError(
+          await postRaw(
+            JSON.stringify({ action: 'DELETE', ids: [newId()] }),
+            role,
+          ),
+          400,
+          'VALIDATION_FAILED',
+        );
+      },
+    );
+
+    it('is FORBIDDEN without a known user', async () => {
+      expectError(await postRaw('{not json', null), 403, 'FORBIDDEN');
+    });
+
+    it('is FORBIDDEN for CLERK once the action is readable, even when the rest is malformed', async () => {
+      expectError(
+        await postRaw(
+          JSON.stringify({ action: 'ARCHIVE', ids: 'oops' }),
+          'CLERK',
+        ),
+        403,
+        'FORBIDDEN',
+      );
+    });
+  });
+
+  // These two run in order: the second proves the first one's change did not leak
+  // into the next test's store, nor into the shared seed objects.
+  describe('isolation between tests', () => {
+    let archivedId: Id | undefined;
+
+    it('archives a product (and leaves the seed object as it was)', async () => {
+      const [product] = archivable(1);
+      if (!product) throw new Error('unreachable');
+      archivedId = product.id;
+      const result = await call(BULK, {
+        method: 'POST',
+        body: { action: 'ARCHIVE', ids: [product.id] },
+      });
+      expect(result.status).toBe(200);
+      expect(stored(product.id)?.archivedAt).not.toBeNull();
+      // `product` is the object the store started from: the seed's own.
+      expect(product.archivedAt).toBeNull();
+    });
+
+    it('starts the next test with that product active again', async () => {
+      if (archivedId === undefined)
+        throw new Error('The previous test did not run');
+      expect(stored(archivedId)?.archivedAt).toBeNull();
+      expect(
+        getDb().products.find((p) => p.id === archivedId)?.archivedAt,
+      ).toBeNull();
+    });
+  });
+});
+
+describe('archiveConflictMessage', () => {
+  const tail =
+    ': reserved on confirmed or picked orders. Cancel or complete those orders first.';
+
+  it.each([
+    [['A'], "Can't archive A"],
+    [['A', 'B'], "Can't archive A and B"],
+    [['A', 'B', 'C'], "Can't archive A, B and C"],
+    [['A', 'B', 'C', 'D', 'E'], "Can't archive A, B, C, D and E"],
+    [
+      ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+      "Can't archive A, B, C, D, E and 2 more",
+    ],
+  ])('names %j', (skus, start) => {
+    expect(archiveConflictMessage(skus)).toBe(start + tail);
   });
 });
 
