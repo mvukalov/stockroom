@@ -109,3 +109,19 @@ export const ENDPOINTS = {
 } as const satisfies Record<string, EndpointDef>;
 
 export type EndpointName = keyof typeof ENDPOINTS;
+
+type EndpointPart<
+  N extends EndpointName,
+  K extends 'params' | 'query' | 'body',
+> = (typeof ENDPOINTS)[N] extends Record<K, infer S> ? z.input<S> : undefined;
+
+/** Success body of an endpoint, after parsing with its response schema. */
+export type EndpointResponse<N extends EndpointName> = z.output<
+  (typeof ENDPOINTS)[N]['response']
+>;
+/** Path parameters as the caller sends them; `undefined` when the path has none. */
+export type EndpointParams<N extends EndpointName> = EndpointPart<N, 'params'>;
+/** Query as the caller sends it, before defaults and fallbacks; `undefined` when there is none. */
+export type EndpointQuery<N extends EndpointName> = EndpointPart<N, 'query'>;
+/** Request body as the caller sends it; `undefined` when there is none. */
+export type EndpointBody<N extends EndpointName> = EndpointPart<N, 'body'>;
