@@ -7,6 +7,7 @@ import { ROUTES } from '../../app/routes';
 import { Skeleton } from '../../components/atoms/Skeleton/Skeleton';
 import { VisuallyHidden } from '../../components/atoms/VisuallyHidden/VisuallyHidden';
 import { EmptyState } from '../../components/molecules/EmptyState/EmptyState';
+import { ScrollRegion } from '../../components/molecules/ScrollRegion/ScrollRegion';
 import { StockStatusBadge } from '../../components/molecules/StockStatusBadge/StockStatusBadge';
 import { formatCount } from '../../utils/formatCount';
 import styles from './LowStockSection.module.scss';
@@ -52,17 +53,7 @@ export function LowStockSection({
           description="No product is at or below its minimum stock level."
         />
       ) : (
-        // A scrollable region with no focusable content must be focusable itself, or a
-        // keyboard user cannot scroll the table sideways at narrow widths (axe
-        // scrollable-region-focusable). `group` names it without adding a landmark.
-        <div
-          className={styles.scroller}
-          // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role
-          role="group"
-          aria-labelledby={captionId}
-          // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          tabIndex={0}
-        >
+        <ScrollRegion labelledBy={captionId}>
           <table className={styles.table}>
             <caption id={captionId}>
               <VisuallyHidden>
@@ -130,7 +121,7 @@ export function LowStockSection({
                   ))}
             </tbody>
           </table>
-        </div>
+        </ScrollRegion>
       )}
 
       {items !== undefined && items.length > LOW_STOCK_PREVIEW_LIMIT && (
