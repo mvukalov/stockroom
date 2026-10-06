@@ -1,0 +1,49 @@
+// Tested pairs: --color-text and --color-text-muted on --color-surface;
+// --color-danger on --color-surface.
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-overlay);
+  animation: enter var(--duration-base) var(--easing-standard);
+}
+
+.text {
+  display: grid;
+  flex: 1 1 auto;
+  gap: var(--space-1);
+  min-width: 0;
+  padding-block: var(--space-1);
+  overflow-wrap: anywhere;
+}
+
+.message {
+  font-weight: var(--font-weight-medium);
+}
+
+.detail {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: var(--font-size-caption);
+}
+
+.action,
+.dismiss {
+  flex-shrink: 0;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-2));
+  }
+}

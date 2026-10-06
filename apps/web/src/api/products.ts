@@ -26,7 +26,11 @@ export const PRODUCT_FILTERS_QUERY_KEY = ['product-filters'] as const;
  * One page of products for a parsed `ProductsQuery`. The previous page stays on
  * screen while the next one loads, so paging and sorting never flash a skeleton.
  */
-export function useProducts(query: ProductsQuery, userId: Id | null) {
+export function useProducts(
+  query: ProductsQuery,
+  userId: Id | null,
+  { enabled = true }: { enabled?: boolean } = {},
+) {
   return useQuery({
     queryKey: [...PRODUCTS_QUERY_KEY, query],
     queryFn: async ({ signal }) =>
@@ -38,7 +42,7 @@ export function useProducts(query: ProductsQuery, userId: Id | null) {
           signal,
         }),
       ),
-    enabled: userId !== null,
+    enabled: enabled && userId !== null,
     placeholderData: keepPreviousData,
   });
 }

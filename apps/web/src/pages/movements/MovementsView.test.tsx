@@ -33,6 +33,7 @@ function props(overrides: Partial<Props> = {}): Props {
     announcement: '',
     copyStatus: null,
     onCopyId: vi.fn(),
+    savingIds: new Set(),
     ...overrides,
   };
 }
@@ -100,5 +101,22 @@ describe('MovementsView', () => {
     // The filters that need no options keep working, and so does the list.
     expect(screen.getByRole('combobox', { name: 'Type' })).toBeEnabled();
     expect(columnText('Created by')).toHaveLength(5);
+  });
+
+  it('marks a row that is still saving with text and gives it no Copy ID', () => {
+    const rows = fixtureMovements(2);
+    const [saving, saved] = rows;
+    if (!saving || !saved) throw new Error('Fixture rows missing');
+    render(
+      <MovementsView {...props({ rows, savingIds: new Set([saving.id]) })} />,
+    );
+
+    expect(columnText('Date/time')[0]).toBe('Saving…');
+    expect(
+      screen.queryByRole('button', { name: `Copy ID ${saving.id}` }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: `Copy ID ${saved.id}` }),
+    ).toBeInTheDocument();
   });
 });

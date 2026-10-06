@@ -6,10 +6,17 @@ import {
   type RefObject,
 } from 'react';
 
+import { cx } from '../../../utils/cx';
 import styles from './Dialog.module.scss';
 
 type DialogProps = {
   open: boolean;
+  /**
+   * `modal`: centred, sized to its content. `drawer`: a full-height panel on the
+   * right (full width on a narrow screen) whose body scrolls between a fixed title
+   * and footer.
+   */
+  variant?: 'modal' | 'drawer';
   title: string;
   /** Read with the title when the dialog opens (`aria-describedby`). */
   description?: ReactNode;
@@ -36,6 +43,7 @@ type DialogProps = {
  */
 export function Dialog({
   open,
+  variant = 'modal',
   title,
   description,
   onDismiss,
@@ -72,7 +80,7 @@ export function Dialog({
       ref={dialogRef}
       aria-labelledby={titleId}
       aria-describedby={description === undefined ? undefined : descriptionId}
-      className={styles.dialog}
+      className={cx(styles.dialog, variant === 'drawer' && styles.drawer)}
       onCancel={(event) => {
         // Escape: the caller decides, through `open`.
         event.preventDefault();

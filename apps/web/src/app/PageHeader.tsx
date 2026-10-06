@@ -5,8 +5,18 @@ import { usePageTitle } from './pageTitle';
 
 /**
  * The page title row, titled from the route `handle` like the top bar. `children`
- * go under the title (see `PageTitle`).
+ * go under the title and `actions` at the end of the row (see `PageTitle`).
  */
-export function PageHeader({ children }: { children?: ReactNode }) {
-  return <PageTitle title={usePageTitle()}>{children}</PageTitle>;
+export function PageHeader({
+  children,
+  actions,
+}: {
+  children?: ReactNode;
+  actions?: ReactNode;
+}) {
+  return (
+    <PageTitle title={usePageTitle()} actions={actions}>
+      {children}
+    </PageTitle>
+  );
 }

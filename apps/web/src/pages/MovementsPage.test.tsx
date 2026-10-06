@@ -455,10 +455,9 @@ describe('MovementsPage as VIEWER', () => {
     expect(
       within(dataRows()[0]!).getByText(shortId(newest.id)),
     ).toBeInTheDocument();
-    expect(
-      within(screen.getByRole('main'))
-        .getAllByRole('button')
-        .map((b) => b.textContent),
-    ).not.toContain('New movement');
+    // Visible but read-only, with the reason (project overview, Permissions).
+    const newMovement = screen.getByRole('button', { name: 'New movement' });
+    expect(newMovement).toHaveAttribute('aria-disabled', 'true');
+    expect(newMovement).toHaveAccessibleDescription('Your role is read-only');
   });
 });

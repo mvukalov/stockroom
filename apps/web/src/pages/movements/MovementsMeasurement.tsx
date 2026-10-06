@@ -74,6 +74,7 @@ const COLUMNS = movementColumns({
   userName: (id) => userNames.get(id),
   onCopyId: () => {},
   copiedId: undefined,
+  savingIds: new Set(),
 });
 
 export function MovementsMeasurement({

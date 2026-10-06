@@ -24,3 +24,9 @@
   color: var(--color-text-muted);
   font-size: var(--font-size-body);
 }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

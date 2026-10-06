@@ -187,6 +187,51 @@ describe('VirtualTable', () => {
     expect(button).not.toBeInTheDocument();
   });
 
+  it('keeps the rows in view still when a row is added or removed at the top of a scrolled list', () => {
+    const rows = rowsOf(1000);
+    const added = [{ id: 'new', name: 'New item', quantity: 0 }, ...rows];
+    const { rerender } = render(<VirtualTable {...props({ rows })} />);
+    scrollTo(scrollBox(), 300 * ROW_HEIGHT);
+
+    rerender(<VirtualTable {...props({ rows: added, total: 5001 })} />);
+    expect(scrollBox().scrollTop).toBe(301 * ROW_HEIGHT);
+    expect(table()).toHaveAttribute('aria-rowcount', '5002');
+
+    // Replaced in place (the confirmed row): nothing moves.
+    const confirmed = [{ ...added[0]!, name: 'Saved item' }, ...rows];
+    rerender(<VirtualTable {...props({ rows: confirmed, total: 5001 })} />);
+    expect(scrollBox().scrollTop).toBe(301 * ROW_HEIGHT);
+
+    // Rolled back.
+    rerender(<VirtualTable {...props({ rows })} />);
+    expect(scrollBox().scrollTop).toBe(300 * ROW_HEIGHT);
+  });
+
+  it('shows a row added at the top when the list is at the top, with every row index one higher', () => {
+    const rows = rowsOf(1000);
+    const { rerender } = render(<VirtualTable {...props({ rows })} />);
+    const added = [{ id: 'new', name: 'New item', quantity: 0 }, ...rows];
+
+    rerender(<VirtualTable {...props({ rows: added, total: 5001 })} />);
+    expect(scrollBox().scrollTop).toBe(0);
+    expect(within(dataRows()[0]!).getByText('New item')).toBeInTheDocument();
+    expect(rowIndexes().slice(0, 2)).toEqual([2, 3]);
+    expect(within(dataRows()[1]!).getByText('Item 0')).toBeInTheDocument();
+  });
+
+  it('keeps focus on its row when a row is added above it', () => {
+    const rows = rowsOf(1000);
+    const { rerender } = render(<VirtualTable {...props({ rows })} />);
+    const button = screen.getByRole('button', { name: 'Open Item 0' });
+    act(() => button.focus());
+    scrollTo(scrollBox(), 500 * ROW_HEIGHT);
+
+    const added = [{ id: 'new', name: 'New item', quantity: 0 }, ...rows];
+    rerender(<VirtualTable {...props({ rows: added, total: 5001 })} />);
+    expect(button).toHaveFocus();
+    expect(button.closest('tr')).toHaveAttribute('aria-rowindex', '3');
+  });
+
   it('scrolls a new list to the top once its rows replace the previous ones', () => {
     const { rerender } = render(<VirtualTable {...props()} />);
     scrollTo(scrollBox(), 300 * ROW_HEIGHT);

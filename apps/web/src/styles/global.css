@@ -28,3 +28,10 @@ h4 {
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
+
+/* The page behind a modal dialog or drawer does not scroll. The gutter keeps the
+   layout from shifting sideways when the scrollbar goes away. */
+:root:has(dialog:modal) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}

@@ -1,4 +1,10 @@
-import { Archive, CircleCheck, Download, FolderInput } from 'lucide-react';
+import {
+  Archive,
+  CircleCheck,
+  Download,
+  FolderInput,
+  SlidersHorizontal,
+} from 'lucide-react';
 import type { Ref } from 'react';
 
 import type {
@@ -49,12 +55,17 @@ export function ProductsSummary({ total }: { total: number | undefined }) {
   );
 }
 
+/** Why the bulk Create adjustment waits: it adjusts one product at a time. */
+export const SELECT_ONE_TO_ADJUST = 'Select one product to adjust its stock';
+
 /** The two bulk actions that open a dialog. */
 export type BulkDialogKind = 'category' | 'archive';
 
 /** Why each product action is unavailable to the current user; `undefined` when allowed. */
 export type ProductActionReasons = {
   updateCategory: string | undefined;
+  /** Create adjustment: a stock movement (`movement.create`), not a product change. */
+  adjust: string | undefined;
   archive: string | undefined;
   export: string | undefined;
 };
@@ -85,6 +96,11 @@ export type ProductsViewProps = {
     ids: Id[],
     opener: HTMLElement | null,
   ) => void;
+  /** Opens the New movement drawer as an ADJUSTMENT of this product. */
+  onCreateAdjustment: (
+    product: ProductListItem,
+    opener: HTMLElement | null,
+  ) => void;
   /** Export CSV of these rows (the selected rows on this page). */
   onExport: (rows: ProductListItem[]) => void;
   /** What the last bulk action did, e.g. "3 products archived"; `''` for nothing. */
@@ -110,6 +126,7 @@ export function ProductsView({
   selection,
   actionReasons,
   onOpenDialog,
+  onCreateAdjustment,
   onExport,
   outcome,
   resultsRef,
@@ -137,6 +154,12 @@ export function ProductsView({
             disabledReason: actionReasons.updateCategory,
             onSelect: (button) =>
               onOpenDialog('category', [product.id], button),
+          },
+          {
+            id: 'adjust',
+            label: 'Create adjustment',
+            disabledReason: actionReasons.adjust,
+            onSelect: (button) => onCreateAdjustment(product, button),
           },
           // Archiving an archived product would change nothing.
           ...(product.archivedAt === null
@@ -223,6 +246,20 @@ export function ProductsView({
                 >
                   <Icon icon={FolderInput} />
                   Update category
+                </Button>
+                <Button
+                  disabledReason={
+                    actionReasons.adjust ??
+                    (selectedIds.size === 1 ? undefined : SELECT_ONE_TO_ADJUST)
+                  }
+                  onClick={(event) => {
+                    const [product] = selectedRows(selectedIds);
+                    if (product)
+                      onCreateAdjustment(product, event.currentTarget);
+                  }}
+                >
+                  <Icon icon={SlidersHorizontal} />
+                  Create adjustment
                 </Button>
                 <Button
                   disabledReason={actionReasons.archive}

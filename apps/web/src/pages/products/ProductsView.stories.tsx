@@ -20,6 +20,7 @@ import {
 
 const ALL_ALLOWED: ProductActionReasons = {
   updateCategory: undefined,
+  adjust: undefined,
   archive: undefined,
   export: undefined,
 };
@@ -58,6 +59,7 @@ const meta = {
     selection: { selectedIds: new Set(), setSelectedIds: fn() },
     actionReasons: ALL_ALLOWED,
     onOpenDialog: fn(),
+    onCreateAdjustment: fn(),
     onExport: fn(),
     outcome: '',
   },
@@ -173,9 +175,15 @@ export const BulkDeniedViewer: Story = {
     actionReasons: {
       ...ALL_ALLOWED,
       updateCategory: 'Your role is read-only',
+      adjust: 'Your role is read-only',
       archive: 'Your role is read-only',
     },
   },
+};
+
+/** Two products selected: Create adjustment waits for exactly one, and says so. */
+export const BulkAdjustNeedsOne: Story = {
+  args: { selection: selected(ROW_IDS.slice(0, 2)) },
 };
 
 /** After a bulk action: the message above the table, the selection cleared. */
