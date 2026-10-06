@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ENDPOINTS, type MovementListItem } from '@stockroom/contract';
 
 import { DEMO_USER_STORAGE_KEY } from '../app/currentUser/CurrentUserProvider';
+import { DATE_RANGE_MESSAGE } from '../components/molecules/DateRangeFilter/DateRangeFilter';
 import { setMockConfig } from '../mocks/config';
 import { getDb } from '../mocks/db';
 import { seedUser, setupMockServer } from '../test/mockServer';
@@ -13,7 +14,6 @@ import { scrollTo, stubScrollContainerSize } from '../test/scrollContainerSize';
 import { formatCount } from '../utils/formatCount';
 import { formatDateTime } from '../utils/formatDateTime';
 import { shortId } from '../utils/shortId';
-import { DATE_RANGE_MESSAGE } from './movements/MovementsToolbar';
 import {
   MOVEMENTS_DESCRIPTION,
   MOVEMENTS_LOAD_ERROR,

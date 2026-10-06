@@ -1,7 +1,6 @@
 import { useId } from 'react';
 
 import {
-  IsoDate,
   MovementType,
   type Location,
   type MovementsQuery,
@@ -9,10 +8,10 @@ import {
 } from '@stockroom/contract';
 
 import { Button } from '../../components/atoms/Button/Button';
-import { Input } from '../../components/atoms/Input/Input';
 import { Select } from '../../components/atoms/Select/Select';
+import { DateRangeFilter } from '../../components/molecules/DateRangeFilter/DateRangeFilter';
 import { MOVEMENT_TYPE_LABELS } from '../../components/molecules/MovementTypeBadge/movementTypeLabels';
-import { isDateRangeInvalid, type MovementFilterKey } from './movementFilters';
+import type { MovementFilterKey } from './movementFilters';
 import styles from './MovementsView.module.scss';
 
 /** The options of one select that comes from the API. */
@@ -33,27 +32,10 @@ type MovementsToolbarProps = {
   onFilterChange: MovementFilterChange;
 };
 
-export const DATE_RANGE_MESSAGE = 'From must be on or before To.';
-
 const optional = (value: string) => (value === '' ? undefined : value);
 
 function parseType(value: string): MovementType | undefined {
   const parsed = MovementType.safeParse(value);
-  return parsed.success ? parsed.data : undefined;
-}
-
-/**
- * A complete date, or `undefined` for an emptied field.
- *
- * Known limitation (accepted in the 004_01 plan): `from` and `to` are calendar dates
- * in the contract and the API compares them with the UTC day of `createdAt`, while
- * the list shows times in the browser's time zone. In Zagreb (UTC+2), a movement at
- * 00:30 local time on 3 Oct is 22:30 UTC on 2 Oct, so it is listed as "3 Oct 2026,
- * 00:30" but matches From = 2 Oct, not From = 3 Oct. Fixing it needs a time zone in
- * the contract query.
- */
-function parseDate(value: string): IsoDate | undefined {
-  const parsed = IsoDate.safeParse(value);
   return parsed.success ? parsed.data : undefined;
 }
 
@@ -98,10 +80,6 @@ export function MovementsToolbar({
 }: MovementsToolbarProps) {
   const locationNoticeId = useId();
   const userNoticeId = useId();
-  const fromId = useId();
-  const toId = useId();
-  const rangeErrorId = useId();
-  const rangeInvalid = isDateRangeInvalid(query);
 
   return (
     <>
@@ -158,47 +136,12 @@ export function MovementsToolbar({
             </option>
           ))}
       </Select>
-      <div className={styles.dates}>
-        <span className={styles.dateField}>
-          <label htmlFor={fromId} className={styles.dateLabel}>
-            From
-          </label>
-          <Input
-            id={fromId}
-            type="date"
-            className={styles.date}
-            value={query.from ?? ''}
-            max={query.to}
-            aria-invalid={rangeInvalid ? true : undefined}
-            aria-describedby={rangeInvalid ? rangeErrorId : undefined}
-            onChange={(event) =>
-              onFilterChange('from', parseDate(event.target.value))
-            }
-          />
-        </span>
-        <span className={styles.dateField}>
-          <label htmlFor={toId} className={styles.dateLabel}>
-            To
-          </label>
-          <Input
-            id={toId}
-            type="date"
-            className={styles.date}
-            value={query.to ?? ''}
-            min={query.from}
-            aria-invalid={rangeInvalid ? true : undefined}
-            aria-describedby={rangeInvalid ? rangeErrorId : undefined}
-            onChange={(event) =>
-              onFilterChange('to', parseDate(event.target.value))
-            }
-          />
-        </span>
-      </div>
-      {rangeInvalid && (
-        <p id={rangeErrorId} className={styles.rangeError}>
-          {DATE_RANGE_MESSAGE}
-        </p>
-      )}
+      <DateRangeFilter
+        from={query.from}
+        to={query.to}
+        onFromChange={(from) => onFilterChange('from', from)}
+        onToChange={(to) => onFilterChange('to', to)}
+      />
       <OptionsNotice
         id={locationNoticeId}
         state={locations}

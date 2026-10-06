@@ -11,29 +11,28 @@ import type { OrderStatus } from '@stockroom/contract';
 import { assertNever } from '@stockroom/domain';
 
 import { Badge, type BadgeTone } from '../../atoms/Badge/Badge';
+import { ORDER_STATUS_LABELS } from './orderStatusLabels';
 
 type BadgeSpec = {
   tone: BadgeTone;
   icon: LucideIcon;
-  label: string;
   strikethrough?: boolean;
 };
 
 function orderStatusBadge(status: OrderStatus): BadgeSpec {
   switch (status) {
     case 'DRAFT':
-      return { tone: 'neutral', icon: CircleDashed, label: 'Draft' };
+      return { tone: 'neutral', icon: CircleDashed };
     case 'CONFIRMED':
-      return { tone: 'info', icon: CircleCheck, label: 'Confirmed' };
+      return { tone: 'info', icon: CircleCheck };
     case 'PICKED':
-      return { tone: 'warning', icon: Package, label: 'Picked' };
+      return { tone: 'warning', icon: Package };
     case 'SHIPPED':
-      return { tone: 'success', icon: Truck, label: 'Shipped' };
+      return { tone: 'success', icon: Truck };
     case 'CANCELLED':
       return {
         tone: 'neutral',
         icon: CircleX,
-        label: 'Cancelled',
         strikethrough: true,
       };
     default:
@@ -42,10 +41,10 @@ function orderStatusBadge(status: OrderStatus): BadgeSpec {
 }
 
 export function OrderStatusBadge({ status }: { status: OrderStatus }) {
-  const { tone, icon, label, strikethrough = false } = orderStatusBadge(status);
+  const { tone, icon, strikethrough = false } = orderStatusBadge(status);
   return (
     <Badge tone={tone} icon={icon} strikethrough={strikethrough}>
-      {label}
+      {ORDER_STATUS_LABELS[status]}
     </Badge>
   );
 }

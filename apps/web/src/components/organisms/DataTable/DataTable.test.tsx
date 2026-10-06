@@ -424,6 +424,23 @@ describe('states', () => {
     expect(screen.getByText('Page 1 of 1')).toBeVisible();
   });
 
+  it('idle: only the given content, no table, count or pagination', () => {
+    renderTable({
+      data: undefined,
+      isFetching: true,
+      idle: <p>Nothing requested</p>,
+    });
+
+    expect(screen.getByText('Nothing requested')).toBeVisible();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(document.querySelector('[aria-busy]')).toBeNull();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Next page' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Rows per page')).not.toBeInTheDocument();
+  });
+
   it('empty with active filters: says so, chips and Clear filters', async () => {
     const onClearFilters = vi.fn();
     const onRemove = vi.fn();

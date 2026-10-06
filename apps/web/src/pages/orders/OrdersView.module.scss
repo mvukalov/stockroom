@@ -1,0 +1,25 @@
+// Filters wrap onto new lines at narrow widths; none has a fixed width.
+.search {
+  flex: 2 1 14rem;
+  max-width: 22rem;
+}
+
+.filter {
+  flex: 1 1 10rem;
+  max-width: 14rem;
+}
+
+.count {
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.numberLink {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+
+  &:hover {
+    color: var(--color-accent-hover);
+  }
+}

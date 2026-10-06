@@ -11,12 +11,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ENDPOINTS } from '@stockroom/contract';
 
 import { DEMO_USER_STORAGE_KEY } from '../app/currentUser/CurrentUserProvider';
+import { SEARCH_DEBOUNCE_MS } from '../hooks/useSearchText';
 import { setMockConfig } from '../mocks/config';
 import { getDb } from '../mocks/db';
 import { seedUser, setupMockServer } from '../test/mockServer';
 import { renderApp } from '../test/renderApp';
 import { formatCount } from '../utils/formatCount';
-import { SEARCH_DEBOUNCE_MS } from './ProductsPage';
 import {
   PRODUCTS_DESCRIPTION,
   PRODUCTS_LOAD_ERROR,

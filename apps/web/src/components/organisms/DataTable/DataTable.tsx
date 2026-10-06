@@ -62,6 +62,11 @@ export type DataTableProps<T, S extends string> = {
 
   /** The empty table, usually `<Table.Empty>`. Defaults to "No <items> yet". */
   empty?: ReactNode;
+  /**
+   * Nothing was requested on purpose (e.g. a date range that matches nothing): shown
+   * in place of the body. No skeleton, no busy state, no count and no pagination.
+   */
+  idle?: ReactNode;
   /** `Table.Toolbar` and `Table.BulkBar`, in the order they should appear. */
   children?: ReactNode;
 };
@@ -104,6 +109,7 @@ export function DataTable<T, S extends string>({
   onClearFilters,
   selection,
   empty,
+  idle,
   children,
 }: DataTableProps<T, S>) {
   const captionId = useId();
@@ -315,18 +321,26 @@ export function DataTable<T, S extends string>({
     <TableContext value={context}>
       <div className={styles.root}>
         {children}
-        <div className={styles.body}>
-          {/* Rows stay at full contrast while a new page loads; this bar marks it. */}
-          {isFetching && data !== undefined && (
-            <div className={styles.progress} aria-hidden="true">
-              <span className={styles.progressBar} />
+        {idle !== undefined ? (
+          <div className={styles.body}>{idle}</div>
+        ) : (
+          <>
+            <div className={styles.body}>
+              {/* Rows stay at full contrast while a new page loads; this bar marks it. */}
+              {isFetching && data !== undefined && (
+                <div className={styles.progress} aria-hidden="true">
+                  <span className={styles.progressBar} />
+                </div>
+              )}
+              {/* Alone after a failed first load; above the stale rows after a failed refetch. */}
+              {errorBanner && (
+                <div className={styles.message}>{errorBanner}</div>
+              )}
+              {renderBody()}
             </div>
-          )}
-          {/* Alone after a failed first load; above the stale rows after a failed refetch. */}
-          {errorBanner && <div className={styles.message}>{errorBanner}</div>}
-          {renderBody()}
-        </div>
-        <TablePagination />
+            <TablePagination />
+          </>
+        )}
       </div>
     </TableContext>
   );

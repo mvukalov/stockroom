@@ -14,8 +14,15 @@ const LABELS: Record<OrderStatus, string> = {
 };
 
 describe('OrderStatusBadge', () => {
-  it.each(OrderStatus.options)('shows a text label for %s', (status) => {
-    render(<OrderStatusBadge status={status} />);
-    expect(screen.getByText(LABELS[status])).toBeVisible();
-  });
+  it.each(OrderStatus.options)(
+    'shows a text label and an icon for %s',
+    (status) => {
+      const { container } = render(<OrderStatusBadge status={status} />);
+      expect(screen.getByText(LABELS[status])).toBeVisible();
+      expect(container.querySelector('svg')).toHaveAttribute(
+        'aria-hidden',
+        'true',
+      );
+    },
+  );
 });

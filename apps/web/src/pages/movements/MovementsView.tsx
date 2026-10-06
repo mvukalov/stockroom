@@ -15,12 +15,9 @@ import { EmptyState } from '../../components/molecules/EmptyState/EmptyState';
 import { ErrorBanner } from '../../components/molecules/ErrorBanner/ErrorBanner';
 import { FilterChips } from '../../components/organisms/DataTable/TableParts';
 import { VirtualTable } from '../../components/organisms/VirtualTable/VirtualTable';
+import { isDateRangeInvalid } from '../../utils/dateRange';
 import { MOVEMENTS_MIN_WIDTH, movementColumns } from './movementColumns';
-import {
-  isDateRangeInvalid,
-  movementFilterChips,
-  type MovementFilterKey,
-} from './movementFilters';
+import { movementFilterChips, type MovementFilterKey } from './movementFilters';
 import {
   MovementsToolbar,
   type MovementFilterChange,
