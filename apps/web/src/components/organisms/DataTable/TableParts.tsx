@@ -8,7 +8,7 @@ import { IconButton } from '../../atoms/IconButton/IconButton';
 import { EmptyState } from '../../molecules/EmptyState/EmptyState';
 import { ColumnsMenu } from './ColumnsMenu';
 import styles from './DataTable.module.scss';
-import { nounFor, useTableContext } from './tableContext';
+import { nounFor, useTableContext, type ActiveFilter } from './tableContext';
 
 /**
  * The row above the table: the caller's filters, then Columns and, while filters
@@ -31,26 +31,34 @@ export function TableToolbar({ children }: { children?: ReactNode }) {
           )}
         </div>
       </div>
-      {hasFilters && (
-        <div className={styles.chips}>
-          <span className={styles.chipsLabel}>Active filters</span>
-          <ul className={styles.chipList}>
-            {activeFilters.map((filter) => (
-              <li key={filter.id} className={styles.chip}>
-                <span>
-                  {filter.label}: {filter.value}
-                </span>
-                <IconButton
-                  icon={X}
-                  label={`Remove filter ${filter.label}: ${filter.value}`}
-                  className={styles.chipRemove}
-                  onClick={filter.onRemove}
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {hasFilters && <FilterChips filters={activeFilters} />}
+    </div>
+  );
+}
+
+/**
+ * The active filters as chips, each with a remove button. Used by `Table.Toolbar`,
+ * and by lists outside `DataTable` that show the same chips.
+ */
+export function FilterChips({ filters }: { filters: readonly ActiveFilter[] }) {
+  return (
+    <div className={styles.chips}>
+      <span className={styles.chipsLabel}>Active filters</span>
+      <ul className={styles.chipList}>
+        {filters.map((filter) => (
+          <li key={filter.id} className={styles.chip}>
+            <span>
+              {filter.label}: {filter.value}
+            </span>
+            <IconButton
+              icon={X}
+              label={`Remove filter ${filter.label}: ${filter.value}`}
+              className={styles.chipRemove}
+              onClick={filter.onRemove}
+            />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

@@ -1,0 +1,173 @@
+.count {
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+// Static information, not an alert: it never changes and needs no announcement.
+// Tested pair: --color-info on --color-info-bg.
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-info);
+  border-radius: var(--radius-card);
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 0.15em;
+  }
+}
+
+// The list card: filters, chips, messages and the table.
+.results {
+  min-width: 0;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface);
+}
+
+.toolbar {
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.toolbarRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+
+// Filters wrap onto new lines at narrow widths; none has a fixed width.
+.filters {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.clear {
+  margin-inline-start: auto;
+}
+
+.filter {
+  flex: 1 1 9rem;
+  max-width: 13rem;
+}
+
+.dates {
+  display: flex;
+  flex: 2 1 18rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 26rem;
+}
+
+// A label stays on the same line as its date field.
+.dateField {
+  display: flex;
+  flex: 1 1 11rem;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.dateLabel {
+  min-width: 2.5em;
+  color: var(--color-text-muted);
+}
+
+.date {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rangeError {
+  flex-basis: 100%;
+  color: var(--color-danger);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+}
+
+.optionsNotice {
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+
+.message {
+  padding: var(--space-3);
+}
+
+// Polite status under the list: the outcome of Copy ID. Empty, it takes no space.
+.copyStatus {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-top: var(--border-width) solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+
+  // Stays in the accessibility tree while empty, so its next message is announced.
+  &:empty {
+    padding: 0;
+    border-top: 0;
+  }
+}
+
+// Cells. Each fits one line of a fixed-height row; Date/time and Product fit two.
+.product,
+.stack {
+  display: grid;
+  line-height: var(--line-height-tight);
+}
+
+.secondary {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+
+.truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sku {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+}
+
+// The sign is in the text; colour only reinforces it.
+.increase {
+  color: var(--color-success);
+  font-weight: var(--font-weight-semibold);
+}
+
+.decrease {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-semibold);
+}
+
+.none {
+  font-weight: var(--font-weight-semibold);
+}
+
+.idCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  white-space: nowrap;
+}

@@ -1,0 +1,76 @@
+// Cell padding, borders, alignment, the sort button and the progress bar come from
+// DataTable.module.scss; this file adds what a virtualized table needs on top.
+
+// Scrolls on both axes inside its own box: rows vertically, wide columns sideways,
+// so the page never scrolls sideways. Its height leaves room for the page header and
+// the filters above, and never falls below a usable list.
+// `isolation` keeps the sticky header's z-index inside the list.
+.scroll {
+  isolation: isolate;
+  position: relative;
+  max-block-size: max(18rem, calc(100dvh - 20rem));
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+// `table.table` beats DataTable's `.table th`/`.table td` rules whatever the order
+// the two stylesheets load in.
+table.table {
+  // Columns take their widths from `<col>` only, so rendering other rows never
+  // changes them. A collapsed border would scroll away from a sticky header cell.
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  th {
+    position: sticky;
+    z-index: 1;
+    top: 0;
+  }
+
+  // Narrower than DataTable's cells, so eight columns fit a 974 px list; the outer
+  // edges keep DataTable's inset and line up with the toolbar.
+  th,
+  td {
+    padding-inline: var(--space-2);
+  }
+
+  th:first-child,
+  td:first-child {
+    padding-inline-start: var(--space-3);
+  }
+
+  th:last-child,
+  td:last-child {
+    padding-inline-end: var(--space-3);
+  }
+
+  // Every row is exactly `--table-row-height`: the virtualizer places rows by that
+  // height alone. Cells centre their content without vertical padding, so a 32 px
+  // icon button still fits. Text never wraps; a long value ends in an ellipsis.
+  td {
+    padding-block: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.row {
+  height: var(--table-row-height);
+}
+
+// Stands in for rows that are not rendered; its height is set inline.
+table.table .spacer td {
+  height: auto;
+  padding: 0;
+  border: 0;
+}
+
+.end {
+  padding: var(--space-3);
+  border-top: var(--border-width) solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  text-align: center;
+}
