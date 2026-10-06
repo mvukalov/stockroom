@@ -4,6 +4,7 @@ import { AuditLogEntry } from './audit';
 import {
   BulkProductsInput,
   BulkProductsResponse,
+  Location,
   ProductFilters,
   ProductListItem,
 } from './catalog';
@@ -79,6 +80,12 @@ export const ENDPOINTS = {
     path: '/api/products/bulk',
     body: BulkProductsInput,
     response: BulkProductsResponse,
+  },
+  // Every location, sorted by code: the options of the movement Location filter.
+  listLocations: {
+    method: 'GET',
+    path: '/api/locations',
+    response: z.array(Location),
   },
   listMovements: {
     method: 'GET',

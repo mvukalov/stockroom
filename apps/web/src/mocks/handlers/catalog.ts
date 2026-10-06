@@ -99,6 +99,17 @@ export const catalogHandlers = [
     return respond(ENDPOINTS.listProducts.response, paginate(sorted, query));
   }),
 
+  route('listLocations', ({ request, db }) => {
+    const user = authorize(request, db, 'view');
+    if (!user.ok) return user.error;
+
+    // Codes share one fixed format (`A-01-03`), so code-unit order is code order.
+    const locations = [...db.locations].sort((a, b) =>
+      a.code < b.code ? -1 : a.code > b.code ? 1 : 0,
+    );
+    return respond(ENDPOINTS.listLocations.response, locations);
+  }),
+
   // Registered with the other `/api/products` routes; a future `/api/products/:id`
   // must come after it (see `ENDPOINTS.listProductFilters`).
   route('listProductFilters', ({ request, db }) => {

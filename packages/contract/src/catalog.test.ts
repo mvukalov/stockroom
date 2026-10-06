@@ -5,6 +5,7 @@ import {
   BulkProductsResponse,
   ProductFilters,
 } from './catalog';
+import { ENDPOINTS } from './endpoints';
 
 const SAFETY = { id: '0b6f5c1e-2f4a-4c8e-9a6b-1d2e3f405162', name: 'Safety' };
 
@@ -100,5 +101,25 @@ describe('BulkProductsResponse', () => {
   it('accepts the updated ids', () => {
     const body = { updatedIds: [SAFETY.id] };
     expect(BulkProductsResponse.parse(body)).toEqual(body);
+  });
+});
+
+describe('listLocations response', () => {
+  const schema = ENDPOINTS.listLocations.response;
+  const location = {
+    id: '6a1d2c3b-4e5f-4a6b-8c7d-9e0f1a2b3c4d',
+    warehouseId: '7b2e3d4c-5f6a-4b7c-9d8e-0f1a2b3c4d5e',
+    code: 'A-01-03',
+  };
+
+  it('accepts a list of locations, and an empty list', () => {
+    expect(schema.parse([location])).toEqual([location]);
+    expect(schema.parse([])).toEqual([]);
+  });
+
+  it('rejects a code outside the A-01-03 format', () => {
+    expect(schema.safeParse([{ ...location, code: 'Dock 1' }]).success).toBe(
+      false,
+    );
   });
 });

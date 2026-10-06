@@ -122,6 +122,7 @@ describe('every endpoint responds with its contract schema', () => {
     ['listProducts', '/api/products?sort=-onHand&pageSize=100'],
     ['listProducts', '/api/products?archived=true&stockStatus=LOW'],
     ['listProductFilters', '/api/products/filters'],
+    ['listLocations', '/api/locations'],
     ['listMovements', '/api/movements?type=TRANSFER&pageSize=100'],
     ['listOrders', '/api/orders?status=DRAFT'],
     ['listAudit', '/api/audit?pageSize=100'],
@@ -178,6 +179,24 @@ describe('every endpoint responds with its contract schema', () => {
     const page = ENDPOINTS.listMovements.response.parse(result.body);
     expect(page.page).toBe(1);
     expect(page.pageSize).toBe(50);
+  });
+});
+
+describe('GET /api/locations', () => {
+  it('lists every location once, in code order', async () => {
+    const db = getDb();
+    const locations = ENDPOINTS.listLocations.response.parse(
+      (await call('/api/locations')).body,
+    );
+
+    const codes = locations.map((l) => l.code);
+    expect(codes).toEqual(db.locations.map((l) => l.code).sort());
+    expect(new Set(locations.map((l) => l.id)).size).toBe(db.locations.length);
+  });
+
+  it('lets VIEWER read and forbids requests without a known user', async () => {
+    expect((await call('/api/locations', { as: 'VIEWER' })).status).toBe(200);
+    expectError(await call('/api/locations', { as: null }), 403, 'FORBIDDEN');
   });
 });
 
@@ -823,6 +842,7 @@ describe('scenarios', () => {
     setMockConfig({ scenario: 'error' });
     expect((await call('/api/products')).status).toBe(500);
     expect((await call('/api/products/filters')).status).toBe(500);
+    expect((await call('/api/locations')).status).toBe(500);
     expect((await call('/api/dashboard')).status).toBe(500);
     expect(
       (await call('/api/movements', { method: 'POST', body: {} })).status,
@@ -854,6 +874,9 @@ describe('scenarios', () => {
     const filters = ENDPOINTS.listProductFilters.response.parse(
       (await call('/api/products/filters')).body,
     );
+    const locations = ENDPOINTS.listLocations.response.parse(
+      (await call('/api/locations')).body,
+    );
 
     expect([
       products.total,
@@ -865,6 +888,7 @@ describe('scenarios', () => {
     expect(dashboard.openOrders.value).toBe(0);
     expect(dashboard.lowStock).toEqual([]);
     expect(filters).toEqual({ categories: [], brands: [] });
+    expect(locations).toEqual([]);
     expect(users.length).toBeGreaterThan(0);
   });
 });
