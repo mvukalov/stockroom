@@ -13,11 +13,9 @@ import { PageHeader } from '../app/PageHeader';
 import { useCurrentUser } from '../app/currentUser/currentUserContext';
 import { Button } from '../components/atoms/Button/Button';
 import { useTableSearchParams } from '../hooks/useTableSearchParams';
+import { isDateRangeInvalid } from '../utils/dateRange';
 import { formatCount } from '../utils/formatCount';
-import {
-  isDateRangeInvalid,
-  MOVEMENT_FILTER_KEYS,
-} from './movements/movementFilters';
+import { MOVEMENT_FILTER_KEYS } from './movements/movementFilters';
 import type { OptionsState } from './movements/MovementsToolbar';
 import { movementCount } from './movements/movementText';
 import {

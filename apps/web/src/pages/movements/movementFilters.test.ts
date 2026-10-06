@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { MovementsQuery } from '@stockroom/contract';
 
-import { isDateRangeInvalid, movementFilterChips } from './movementFilters';
+import { isDateRangeInvalid } from '../../utils/dateRange';
+import { movementFilterChips } from './movementFilters';
 import { MOVEMENT_LOCATIONS, MOVEMENT_USERS } from './movementsFixtures';
 
 const location = MOVEMENT_LOCATIONS[1]!;

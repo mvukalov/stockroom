@@ -33,13 +33,6 @@ export type MovementFilterOptions = {
   users: readonly User[] | undefined;
 };
 
-/** `from` later than `to`: such a range matches nothing and is never requested. */
-export function isDateRangeInvalid(query: MovementsQuery): boolean {
-  return (
-    query.from !== undefined && query.to !== undefined && query.from > query.to
-  );
-}
-
 /**
  * The chips for the filters in a parsed query, in toolbar order. Location and
  * Created by show the code and the name, or the raw id while their options are
