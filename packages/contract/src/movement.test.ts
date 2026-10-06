@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { CreateMovementInput, StockMovement } from './movement';
+import {
+  CreateMovementInput,
+  REASON_MAX_LENGTH,
+  StockMovement,
+} from './movement';
 
 const PRODUCT = '0b6f5c1e-2f4a-4c8e-9a6b-1d2e3f405162';
 const LOC_A = '1c7a6d2f-3a5b-4d9f-8b7c-2e3f40516273';
@@ -61,6 +65,24 @@ describe('CreateMovementInput', () => {
     expect(
       CreateMovementInput.safeParse({ ...issue, reason: '  ' }).success,
     ).toBe(false);
+  });
+
+  it('accepts a reason of exactly REASON_MAX_LENGTH characters and rejects a longer one', () => {
+    const at = 'x'.repeat(REASON_MAX_LENGTH);
+    expect(
+      CreateMovementInput.safeParse({ ...adjustment, reason: at }).success,
+    ).toBe(true);
+    expect(
+      CreateMovementInput.safeParse({ ...adjustment, reason: `${at}x` })
+        .success,
+    ).toBe(false);
+  });
+
+  it('counts the reason length after trimming', () => {
+    const padded = ` ${'x'.repeat(REASON_MAX_LENGTH)} `;
+    expect(
+      CreateMovementInput.safeParse({ ...adjustment, reason: padded }).success,
+    ).toBe(true);
   });
 
   it('rejects ADJUSTMENT without a reason', () => {

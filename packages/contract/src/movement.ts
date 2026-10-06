@@ -14,7 +14,10 @@ export type MovementType = z.infer<typeof MovementType>;
 export const AdjustmentDirection = z.enum(['INCREASE', 'DECREASE']);
 export type AdjustmentDirection = z.infer<typeof AdjustmentDirection>;
 
-const Reason = z.string().trim().min(1);
+/** Longest reason a movement accepts, in characters (after trimming). */
+export const REASON_MAX_LENGTH = 200;
+
+const Reason = z.string().trim().min(1).max(REASON_MAX_LENGTH);
 
 // `quantity` is always positive. The sign is derived from `type`
 // (and `direction` for ADJUSTMENT); TRANSFER is shown unsigned.

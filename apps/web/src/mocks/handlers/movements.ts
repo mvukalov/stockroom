@@ -6,6 +6,7 @@ import {
 import {
   assertNever,
   movementAuditEntry,
+  movementMatchesQuery,
   validateMovement,
 } from '@stockroom/domain';
 
@@ -18,7 +19,7 @@ import {
   respond,
   validationError,
 } from '../http';
-import { inDateRange, paginate, sortBy } from '../listing';
+import { paginate, sortBy } from '../listing';
 import { auditLookups, toMovementListItem } from '../readModels';
 import { route } from '../route';
 
@@ -61,17 +62,7 @@ export const movementHandlers = [
     if (!user.ok) return user.error;
     const query = parseQuery(request, ENDPOINTS.listMovements.query);
 
-    const rows = db.movements.filter(
-      (m) =>
-        (query.type === undefined || m.type === query.type) &&
-        (query.productId === undefined || m.productId === query.productId) &&
-        (query.locationId === undefined ||
-          m.locationId === query.locationId ||
-          (m.type === 'TRANSFER' &&
-            m.destinationLocationId === query.locationId)) &&
-        (query.userId === undefined || m.createdBy === query.userId) &&
-        inDateRange(m.createdAt, query),
-    );
+    const rows = db.movements.filter((m) => movementMatchesQuery(m, query));
     const sorted = sortBy(rows, query.sort, {
       createdAt: (m) => m.createdAt,
       type: (m) => m.type,

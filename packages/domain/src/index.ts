@@ -2,6 +2,7 @@ export * from './result';
 export * from './deterministicId';
 export * from './stock';
 export * from './movementValidation';
+export * from './movementQuery';
 export * from './orderTotals';
 export * from './orderStateMachine';
 export * from './orderEdit';
