@@ -171,3 +171,9 @@
   gap: var(--space-1);
   white-space: nowrap;
 }
+
+// A row still being saved: the text says so, the muted colour only supports it.
+.saving {
+  color: var(--color-text-muted);
+  font-style: italic;
+}

@@ -99,8 +99,8 @@ These are the rules the prototype settled. The domain package must enforce them 
 - `ISSUE` and `TRANSFER` cannot exceed the stock available at the source location. An `ADJUSTMENT` cannot take stock below zero. Violations are blocking validation errors (Save is disabled), not warnings.
 - `ADJUSTMENT` requires a reason. Other types have an optional reason.
 - Movements are immutable and there is no delete. A mistake is corrected with a new `ADJUSTMENT`.
-- **Undo is a pre-commit window, not a reversal.** After "Save movement" the row appears in a pending state with a "Saving movement... Undo" toast for 5 seconds. Undo within that window discards the movement without ever sending it. After the window it is committed and can only be corrected by an adjustment.
-- If the server rejects a movement (for example stock changed in the meantime), the optimistic row rolls back to a failed row with the cause ("Could not save: only 14 on hand now") and a visible Retry. Retry reuses the same client-generated ID, so it is idempotent.
+- **Undo is a reversing movement, not a deletion** (decided in spec 004_02; it replaces the earlier pre-commit window, which would lose a movement if the tab closed during the window). After "Save movement" the row appears at once, marked "Saving…", and a toast ("Receipt saved: +14 × … at A-01-03") offers Undo for 10 seconds. Undo posts the reverse movement: a RECEIPT is reversed by an ADJUSTMENT DECREASE, an ISSUE by an ADJUSTMENT INCREASE, a TRANSFER by a TRANSFER back, an ADJUSTMENT by one in the other direction, with the reason "Undo of <short id>". The reverse has its own idempotency key and is offered once; if it is refused (the stock was used meanwhile) the toast says why.
+- If the server rejects a movement (for example stock changed in the meantime), the optimistic row and the count roll back exactly and the drawer stays open with the cause at the Quantity field ("Only 14 on hand now. Lower the quantity."). Without an answer, the drawer shows the error and its primary action becomes Retry. Retry reuses the same client-generated ID, so it is idempotent.
 
 **Products**
 - There is no direct stock editing and no product deletion. Stock is changed with "Create adjustment"; products are removed from use with "Archive". A product with history keeps its movement history.
@@ -160,7 +160,7 @@ The prototype is done. Screenshots are in `context/design/` (see its `README.md`
 1. Dashboard: KPI cards, low-stock list (default, loading, empty, error)
 2. Products: `DataTable` with filters, bulk selection (default, loading, empty with active filters, error)
 3. Stock movements: virtualized history (default, loading, empty, error)
-3b. New movement drawer: empty, validation errors, over stock, submitting (pending), success with Undo, failure with Retry
+3b. New movement drawer: empty, validation errors, over stock, submitting (pending), success with Undo (a reversing movement, see Domain rules), failure with Retry
 4. Orders list (default, loading, empty, error)
 5. Order detail: Draft with shortages, Draft with stock OK, Confirmed, Picked, Shipped, Cancelled, loading, error, cancel confirmation modal
 6. Audit log (default, loading, empty with filters, error, expanded row)

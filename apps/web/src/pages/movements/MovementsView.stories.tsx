@@ -49,6 +49,7 @@ const meta = {
     announcement: '',
     copyStatus: null,
     onCopyId: fn(),
+    savingIds: new Set(),
   },
 } satisfies Meta<typeof MovementsView>;
 
@@ -160,4 +161,9 @@ export const CopyFailed: Story = {
   args: {
     copyStatus: { id: ROWS[0]?.id ?? '', outcome: 'failed' },
   },
+};
+
+/** A new movement at the top while it saves: "Saving…" instead of its time, no Copy ID. */
+export const WithSavingRow: Story = {
+  args: { savingIds: new Set(ROWS[0] ? [ROWS[0].id] : []) },
 };

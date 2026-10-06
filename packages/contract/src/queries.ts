@@ -16,11 +16,17 @@ const page = z.coerce.number().int().min(1).catch(1);
 const pageSize = (fallback: PageSize) =>
   z.coerce.number().pipe(PageSize).catch(fallback);
 
+/**
+ * Longest search text a list query takes. A longer value fails and falls back to no
+ * search at all, so search fields cut their text to this length.
+ */
+export const SEARCH_MAX_LENGTH = 200;
+
 const optionalText = z
   .string()
   .trim()
   .min(1)
-  .max(200)
+  .max(SEARCH_MAX_LENGTH)
   .optional()
   .catch(undefined);
 

@@ -19,6 +19,7 @@ import { VisuallyHidden } from '../../atoms/VisuallyHidden/VisuallyHidden';
 import { cellText, type ColumnDef } from '../DataTable/columns';
 import tableStyles from '../DataTable/DataTable.module.scss';
 import { SortHeader } from '../DataTable/SortHeader';
+import { topShift } from './topShift';
 import styles from './VirtualTable.module.scss';
 
 /**
@@ -58,6 +59,23 @@ function readRowHeight(): number {
     return amount * (Number.isNaN(rootFontSize) ? 16 : rootFontSize);
   }
   return value.endsWith('px') ? amount : FALLBACK_ROW_HEIGHT_PX;
+}
+
+type FocusedRow = { id: string; index: number };
+
+/** Where the focused row is now: its last index if it is still there, else a search. */
+function indexOfRow<T>(
+  rows: readonly T[] | undefined,
+  focused: FocusedRow | null,
+  getRowId: (row: T) => string,
+): number | null {
+  if (rows === undefined || focused === null) return null;
+  const atLast = rows[focused.index];
+  if (atLast !== undefined && getRowId(atLast) === focused.id) {
+    return focused.index;
+  }
+  const index = rows.findIndex((row) => getRowId(row) === focused.id);
+  return index === -1 ? null : index;
 }
 
 export type VirtualTableProps<T, S extends string> = {
@@ -134,7 +152,10 @@ export function VirtualTable<T, S extends string>({
   const [rowHeight] = useState(readRowHeight);
   // The row holding keyboard focus stays rendered, wherever the list scrolls, until
   // focus leaves it; unmounting it would drop focus to the page.
-  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+  // Kept by id, so a row added or removed above it (a movement being saved) does not
+  // move the focus to another row; `index` is where it was last seen, for a quick check.
+  const [focusedRow, setFocusedRow] = useState<FocusedRow | null>(null);
+  const focusedIndex = indexOfRow(rows, focusedRow, getRowId);
 
   const count = rows?.length ?? 0;
   // The project does not use React Compiler; the virtualizer re-renders this
@@ -168,24 +189,47 @@ export function VirtualTable<T, S extends string>({
     if (lastVisibleIndex >= count - 1 - LOAD_MORE_THRESHOLD) onLoadMore();
   }, [canLoadMore, lastVisibleIndex, count, onLoadMore]);
 
+  // Rows added or removed above the first one (a movement being saved, or its
+  // rollback) would push the rows in view down or pull them up. When the list is
+  // scrolled, the scroll position moves by the same height, so the rows in view stay
+  // put; at the top the new row simply appears. Runs before the reset below, which
+  // wins for a new list.
+  const shiftedRows = useRef({ rows, key: resetKey });
+  useLayoutEffect(() => {
+    const previous = shiftedRows.current;
+    shiftedRows.current = { rows, key: resetKey };
+    if (!virtualize || previous.rows === rows || previous.key !== resetKey) {
+      return;
+    }
+    const shift = topShift(previous.rows, rows, getRowId);
+    if (shift === 0) return;
+    const scroll = scrollRef.current;
+    if (scroll && scroll.scrollTop > 0) {
+      scroll.scrollTop = Math.max(0, scroll.scrollTop + shift * rowHeight);
+    }
+  }, [rows, resetKey, virtualize, getRowId, rowHeight]);
+
   // A new list starts at the top, once its own rows have replaced the previous ones.
   const shownKey = useRef(resetKey);
   useLayoutEffect(() => {
     if (isRefreshing || shownKey.current === resetKey) return;
     shownKey.current = resetKey;
-    setFocusedIndex(null);
+    setFocusedRow(null);
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [isRefreshing, resetKey]);
 
   const trackFocus = (event: FocusEvent<HTMLTableSectionElement>) => {
     const row = event.target.closest<HTMLElement>('tr[data-index]');
     const index = Number(row?.dataset.index);
-    setFocusedIndex(Number.isInteger(index) ? index : null);
+    const focused = Number.isInteger(index) ? rows?.[index] : undefined;
+    setFocusedRow(
+      focused === undefined ? null : { id: getRowId(focused), index },
+    );
   };
   const releaseFocus = (event: FocusEvent<HTMLTableSectionElement>) => {
     const next = event.relatedTarget;
     if (next instanceof Node && event.currentTarget.contains(next)) return;
-    setFocusedIndex(null);
+    setFocusedRow(null);
   };
 
   // Rows stay at full contrast while a new list loads; a bar on the top edge marks

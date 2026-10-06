@@ -1,0 +1,205 @@
+@use '../../../styles/mixins';
+
+// Tested pairs: --color-text, --color-text-muted on --color-surface; --color-danger
+// on --color-surface and on --color-danger-bg.
+.form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+// Removes the default fieldset frame; it only disables every field while saving.
+.fields,
+.group {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.group {
+  gap: var(--space-2);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.label {
+  padding: 0;
+  font-weight: var(--font-weight-medium);
+}
+
+.optional {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+// The label is the click target: at least 24 px high.
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target-size-min);
+  cursor: pointer;
+
+  input {
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    margin: 0;
+    accent-color: var(--color-accent);
+  }
+}
+
+// From and To side by side when there is room, one under the other at 375 px.
+.pair {
+  display: grid;
+  gap: var(--space-4);
+
+  @include mixins.from-md {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.quantity {
+  @include mixins.tabular-nums;
+
+  max-width: 10rem;
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: var(--font-size-caption);
+}
+
+.hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+
+.over {
+  color: var(--color-danger);
+}
+
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+}
+
+// Product picker
+.chosenField {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.results {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  list-style: none;
+
+  li + li {
+    border-top: var(--border-width) solid var(--color-border);
+  }
+}
+
+.result {
+  display: grid;
+  gap: var(--space-1);
+  width: 100%;
+  min-height: var(--control-height);
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--color-surface-subtle);
+  }
+}
+
+.resultMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+
+.chosen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface-subtle);
+}
+
+.chosenText {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.chosenTitle {
+  font-weight: var(--font-weight-medium);
+}
+
+// Error summary. Tested pair: --color-danger on --color-danger-bg.
+.summary {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--color-danger);
+  border-radius: var(--radius-card);
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.summaryTitle {
+  margin: 0;
+  font-size: var(--font-size-body);
+}
+
+.summaryList {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding-left: var(--space-4);
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+}

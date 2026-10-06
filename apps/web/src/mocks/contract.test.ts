@@ -5,6 +5,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import {
   ApiError,
   ENDPOINTS,
+  REASON_MAX_LENGTH,
   USER_ID_HEADER,
   type CreateMovementInput,
   type Id,
@@ -83,6 +84,23 @@ function wellStocked() {
 }
 
 const newId = (): Id => crypto.randomUUID();
+
+/** Any location other than `locationId`. */
+function otherLocation(locationId: Id): Id {
+  const other = getDb().locations.find((l) => l.id !== locationId);
+  if (!other) throw new Error('Seed has one location only');
+  return other.id;
+}
+
+/** The product's on hand as `GET /api/products` lists it. */
+async function listedOnHand(sku: string): Promise<number> {
+  const page = ENDPOINTS.listProducts.response.parse(
+    (await call(`/api/products?search=${encodeURIComponent(sku)}`)).body,
+  );
+  const item = page.items.find((p) => p.sku === sku);
+  if (!item) throw new Error(`Product ${sku} is not listed`);
+  return item.onHand;
+}
 
 function receiptInput(): CreateMovementInput {
   const { productId, locationId } = wellStocked();
@@ -644,6 +662,165 @@ describe('POST /api/movements', () => {
       body: { ...receiptInput(), productId: newId() },
     });
     expectError(result, 400, 'VALIDATION_FAILED');
+  });
+
+  it.each(['locationId', 'destinationLocationId'] as const)(
+    'rejects an unknown %s at that field and stores nothing',
+    async (field) => {
+      const db = getDb();
+      const movementsBefore = db.movements.length;
+      const { productId, locationId } = wellStocked();
+      const body = {
+        id: newId(),
+        type: 'TRANSFER',
+        productId,
+        locationId,
+        destinationLocationId: otherLocation(locationId),
+        quantity: 1,
+        reason: null,
+        [field]: newId(),
+      };
+      const error = expectError(
+        await call('/api/movements', { method: 'POST', body }),
+        400,
+        'VALIDATION_FAILED',
+      );
+      if (error.code !== 'VALIDATION_FAILED') return;
+      expect(error.details).toHaveProperty(field);
+      expect(db.movements.length).toBe(movementsBefore);
+    },
+  );
+
+  it('rejects a reason longer than REASON_MAX_LENGTH', async () => {
+    const result = await call('/api/movements', {
+      method: 'POST',
+      body: { ...receiptInput(), reason: 'x'.repeat(REASON_MAX_LENGTH + 1) },
+    });
+    const error = expectError(result, 400, 'VALIDATION_FAILED');
+    if (error.code !== 'VALIDATION_FAILED') return;
+    expect(error.details).toHaveProperty('reason');
+  });
+
+  it('refuses a transfer above the stock at its source and changes no stock', async () => {
+    const db = getDb();
+    const { productId, locationId } = wellStocked();
+    const stockBefore = structuredClone(db.stock.get(productId));
+    const result = await call('/api/movements', {
+      method: 'POST',
+      as: 'CLERK',
+      body: {
+        id: newId(),
+        type: 'TRANSFER',
+        productId,
+        locationId,
+        destinationLocationId: otherLocation(locationId),
+        quantity: 1_000_000,
+        reason: null,
+      },
+    });
+    expectError(result, 409, 'INSUFFICIENT_STOCK');
+    expect(db.stock.get(productId)).toEqual(stockBefore);
+  });
+
+  describe('each type, as CLERK', () => {
+    type Case = {
+      name: string;
+      body: (productId: Id, locationId: Id) => CreateMovementInput;
+      /** Change of the product's total on hand. */
+      delta: number;
+    };
+    const cases: Case[] = [
+      {
+        name: 'RECEIPT',
+        body: (productId, locationId) => ({
+          id: newId(),
+          type: 'RECEIPT',
+          productId,
+          locationId,
+          quantity: 3,
+          reason: null,
+        }),
+        delta: 3,
+      },
+      {
+        name: 'ISSUE',
+        body: (productId, locationId) => ({
+          id: newId(),
+          type: 'ISSUE',
+          productId,
+          locationId,
+          quantity: 1,
+          reason: 'Customer pickup',
+        }),
+        delta: -1,
+      },
+      {
+        name: 'TRANSFER',
+        body: (productId, locationId) => ({
+          id: newId(),
+          type: 'TRANSFER',
+          productId,
+          locationId,
+          destinationLocationId: otherLocation(locationId),
+          quantity: 1,
+          reason: null,
+        }),
+        delta: 0,
+      },
+      {
+        name: 'ADJUSTMENT INCREASE',
+        body: (productId, locationId) => ({
+          id: newId(),
+          type: 'ADJUSTMENT',
+          direction: 'INCREASE',
+          productId,
+          locationId,
+          quantity: 2,
+          reason: 'Stock count',
+        }),
+        delta: 2,
+      },
+      {
+        name: 'ADJUSTMENT DECREASE',
+        body: (productId, locationId) => ({
+          id: newId(),
+          type: 'ADJUSTMENT',
+          direction: 'DECREASE',
+          productId,
+          locationId,
+          quantity: 1,
+          reason: 'Damaged',
+        }),
+        delta: -1,
+      },
+    ];
+
+    it.each(cases)(
+      'stores a $name: newest in the list, product on hand follows',
+      async ({ body, delta }) => {
+        const { productId, locationId } = wellStocked();
+        const product = getDb().productById.get(productId);
+        if (!product) throw new Error('Unknown product');
+        const onHandBefore = await listedOnHand(product.sku);
+        const input = body(productId, locationId);
+
+        const created = await call('/api/movements', {
+          method: 'POST',
+          as: 'CLERK',
+          body: input,
+        });
+
+        expect(created.status).toBe(201);
+        expect(
+          ENDPOINTS.createMovement.response.parse(created.body),
+        ).toMatchObject({ ...input, createdBy: userWith('CLERK').id });
+        const list = ENDPOINTS.listMovements.response.parse(
+          (await call(`/api/movements?productId=${productId}`)).body,
+        );
+        expect(list.items[0]?.id).toBe(input.id);
+        expect(await listedOnHand(product.sku)).toBe(onHandBefore + delta);
+      },
+    );
   });
 });
 

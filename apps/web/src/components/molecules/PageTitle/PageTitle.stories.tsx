@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { Button } from '../../atoms/Button/Button';
 import { PageTitle } from './PageTitle';
 
 const meta = {
@@ -27,5 +28,14 @@ export const WithDetails: Story = {
         <p>194 products</p>
       </>
     ),
+  },
+};
+
+/** The page's primary action at the end of the row, as on Movements. */
+export const WithAction: Story = {
+  args: {
+    title: 'Stock movements',
+    children: <p>Append-only history of every stock change.</p>,
+    actions: <Button variant="primary">New movement</Button>,
   },
 };

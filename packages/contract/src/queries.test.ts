@@ -5,6 +5,7 @@ import {
   MovementsQuery,
   OrdersQuery,
   ProductsQuery,
+  SEARCH_MAX_LENGTH,
 } from './queries';
 
 /** Minimal `Object.fromEntries(new URLSearchParams(search))`; the package has no DOM or Node types. */
@@ -73,6 +74,12 @@ describe('list queries', () => {
     expect(query.status).toBeUndefined();
     expect(query.from).toBeUndefined();
     expect(query.search).toBeUndefined();
+  });
+
+  it('takes a search of SEARCH_MAX_LENGTH characters and drops a longer one', () => {
+    const at = 'x'.repeat(SEARCH_MAX_LENGTH);
+    expect(ProductsQuery.parse({ search: at }).search).toBe(at);
+    expect(ProductsQuery.parse({ search: `${at}x` }).search).toBeUndefined();
   });
 
   it('keeps valid filters', () => {

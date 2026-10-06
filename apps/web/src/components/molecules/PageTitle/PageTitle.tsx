@@ -10,13 +10,16 @@ import styles from './PageTitle.module.scss';
  * (error page) and for stories.
  *
  * `children` go under the `<h1>`, e.g. a short description and a result count.
+ * `actions` sit at the end of the row, e.g. the page's primary button.
  */
 export function PageTitle({
   title,
   children,
+  actions,
 }: {
   title: string;
   children?: ReactNode;
+  actions?: ReactNode;
 }) {
   const heading = (
     <h1 tabIndex={-1} className={styles.heading}>
@@ -35,6 +38,7 @@ export function PageTitle({
           <div className={styles.details}>{children}</div>
         </div>
       )}
+      {actions !== undefined && <div className={styles.actions}>{actions}</div>}
     </div>
   );
 }

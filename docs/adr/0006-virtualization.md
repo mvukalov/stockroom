@@ -53,3 +53,7 @@ C. **Sparse windowed fetching.** The virtualizer has `total` rows; the scrollbar
 - The list requires its own component next to `DataTable`; `DataTable` keeps its page-based API (ADR-0005 stays unchanged: virtualization is not one of its revisit conditions). The new component reuses `ColumnDef`, the sort header, the state parts (skeleton rows, `ErrorBanner`, `EmptyState`) and the scroll region where they fit, and the plan says what it reuses.
 - Revisit if a list needs to jump to arbitrary positions (option C), or if a second virtualized list (Audit) shows that the component should absorb more of `DataTable`.
 - Not decided here: the movement list spec (`004_01`), which holds the exact goals, and the measurement method (decided in that spec's plan, recorded with the numbers).
+
+## Note (2026-10-06, New movement drawer, spec 004_02)
+
+"Resets the query to its first page" is refined: a confirmed new movement stays in place in a list that already shows it (newest first, filters matching), with the same id, so neither a refetch nor a scroll jump follows. Only a list that should hold the movement but could not show it at the top (another sort) keeps its first page alone and is refetched, one request instead of one per loaded page. Rows added or removed above the first row move the scroll position by their height when the list is scrolled, so the rows in view stay still.

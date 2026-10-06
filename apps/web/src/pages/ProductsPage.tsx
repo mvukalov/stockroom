@@ -28,6 +28,8 @@ import {
 } from './products/ProductsView';
 import { UpdateCategoryDialog } from './products/UpdateCategoryDialog';
 import { useBulkDialogs } from './products/useBulkDialogs';
+import { NewMovementDrawer } from './movements/newMovement/NewMovementDrawer';
+import { useNewMovementDrawer } from './movements/newMovement/useNewMovementDrawer';
 
 export const SEARCH_DEBOUNCE_MS = 300;
 
@@ -115,6 +117,7 @@ export function ProductsPage() {
     setOutcome(message);
   });
   const clearOutcome = () => setOutcome('');
+  const adjustment = useNewMovementDrawer();
   /** Runs a table action and clears the outcome of the previous bulk action. */
   const withClear =
     <A extends unknown[]>(handler: (...args: A) => void) =>
@@ -204,10 +207,14 @@ export function ProductsPage() {
         }}
         actionReasons={{
           updateCategory: reasonFor('product.update'),
+          adjust: reasonFor('movement.create'),
           archive: reasonFor('product.archive'),
           export: reasonFor('export'),
         }}
         onOpenDialog={withClear(bulk.open)}
+        onCreateAdjustment={withClear((product, opener) =>
+          adjustment.openAdjustment(opener, product),
+        )}
         onExport={exportRows}
         outcome={outcome}
         resultsRef={resultsRef}
@@ -251,6 +258,7 @@ export function ProductsPage() {
         onDismiss={bulk.dismiss}
         returnFocus={bulk.returnFocus}
       />
+      <NewMovementDrawer {...adjustment.drawerProps} />
     </>
   );
 }

@@ -1,0 +1,30 @@
+@use '../../../styles/mixins';
+
+// Fixed above the page content (the shell's sticky parts use z-index 1 and 2). A
+// modal drawer or dialog sits in the browser's top layer, above this, so toasts never
+// cover its actions; they are shown after it closes.
+.viewport {
+  position: fixed;
+  inset-inline: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 3;
+  pointer-events: none;
+
+  @include mixins.from-md {
+    inset-inline: auto var(--space-6);
+    bottom: var(--space-6);
+    width: 24rem;
+  }
+}
+
+.list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}

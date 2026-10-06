@@ -77,6 +77,8 @@ export type MovementsViewProps = {
   announcement: string;
   copyStatus: CopyStatus | null;
   onCopyId: (id: Id) => void;
+  /** Movements still being saved: their rows say "Saving…" and have no Copy ID yet. */
+  savingIds: ReadonlySet<Id>;
 };
 
 /** The movement history below the page header. Props only; `MovementsPage` picks the state. */
@@ -98,6 +100,7 @@ export function MovementsView({
   announcement,
   copyStatus,
   onCopyId,
+  savingIds,
 }: MovementsViewProps) {
   const options = {
     locations: locations.status === 'ready' ? locations.data : undefined,
@@ -119,6 +122,7 @@ export function MovementsView({
     userName: (id) => userNames.get(id),
     onCopyId,
     copiedId: copyStatus?.outcome === 'copied' ? copyStatus.id : undefined,
+    savingIds,
   });
 
   const clearButton = <Button onClick={onClearFilters}>Clear filters</Button>;

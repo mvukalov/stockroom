@@ -1,11 +1,17 @@
 import { useState } from 'react';
 
 import { MovementsQuery, type Location, type User } from '@stockroom/contract';
+import { denialReason, movementMatchesQuery } from '@stockroom/domain';
 
 import { useLocations } from '../api/locations';
-import { movementsListQuery, useMovements } from '../api/movements';
+import {
+  movementsListQuery,
+  useMovements,
+  useSavingMovementIds,
+} from '../api/movements';
 import { PageHeader } from '../app/PageHeader';
 import { useCurrentUser } from '../app/currentUser/currentUserContext';
+import { Button } from '../components/atoms/Button/Button';
 import { useTableSearchParams } from '../hooks/useTableSearchParams';
 import { formatCount } from '../utils/formatCount';
 import {
@@ -19,6 +25,8 @@ import {
   MovementsView,
   type MovementsViewProps,
 } from './movements/MovementsView';
+import { NewMovementDrawer } from './movements/newMovement/NewMovementDrawer';
+import { useNewMovementDrawer } from './movements/newMovement/useNewMovementDrawer';
 import { useCopyId } from './movements/useCopyId';
 
 /** Connected page: reads the URL and the queries, hands one state to the presentational view. */
@@ -39,6 +47,14 @@ export function MovementsPage() {
   });
   const locationsQuery = useLocations(userId);
   const { status: copyStatus, copy } = useCopyId();
+  const savingIds = useSavingMovementIds();
+  const newMovement = useNewMovementDrawer({
+    isHidden: (movement) => !movementMatchesQuery(movement, listQuery),
+  });
+  const newMovementReason =
+    currentUser === undefined
+      ? 'Choose a user first'
+      : (denialReason(currentUser, 'movement.create') ?? undefined);
 
   const rows = rangeInvalid
     ? undefined
@@ -103,7 +119,17 @@ export function MovementsPage() {
 
   return (
     <>
-      <PageHeader>
+      <PageHeader
+        actions={
+          <Button
+            variant="primary"
+            disabledReason={newMovementReason}
+            onClick={(event) => newMovement.openNew(event.currentTarget)}
+          >
+            New movement
+          </Button>
+        }
+      >
         <MovementsSummary total={total} />
       </PageHeader>
       <MovementsView
@@ -127,7 +153,9 @@ export function MovementsPage() {
         announcement={announced.text}
         copyStatus={copyStatus}
         onCopyId={(id) => void copy(id)}
+        savingIds={savingIds}
       />
+      <NewMovementDrawer {...newMovement.drawerProps} />
     </>
   );
 }

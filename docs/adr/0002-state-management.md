@@ -31,3 +31,9 @@ The justification for Redux in the README and on interviews is the event flow (a
 - Positive: Redux Toolkit in TypeScript, a clear story linking Flux to event sourcing, strong separation of concerns.
 - Negative: more boilerplate than Zustand for a small slice of state. Mitigation: keep slices few (`mutationQueue`, `undo`, `ui`).
 - Revisit if the Redux slices stay trivial after wave 1. Then replace with Zustand in a new ADR.
+
+## Note (2026-10-06, New movement drawer, spec 004_02)
+
+The first slice is `toasts`: the toast queue and the Undo offer of each toast (shown, Undo started, succeeded or failed, dismissed). It holds client intent only (the message and the reverse movement Undo would send), never server data.
+
+The optimistic movement itself does not go through a Redux `mutationQueue` slice. TanStack Query already holds the mutation: `onMutate` writes the row into the cached movement lists and `onSettled` replaces it or rolls it back, and `useMutationState` tells the list which rows are still saving. A Redux copy of that queue would duplicate state TanStack Query owns, which the rule above forbids. The `mutationQueue` and `ui` slices stay possible, but are added only when a feature needs state TanStack Query does not hold. The revisit condition stands: if `toasts` remains the only slice after wave 1, decide on Zustand in a new ADR.

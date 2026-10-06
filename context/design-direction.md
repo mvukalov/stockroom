@@ -92,7 +92,7 @@ Default, loading (skeleton rows), empty (with a helpful next action), error (wit
 
 ## 8. Motion
 
-Minimal: 120-160 ms fades and slides for drawers, toasts and row insertion. Respect `prefers-reduced-motion`. Optimistic rows appear with a subtle "pending" style (muted text, small spinner) and settle or turn into an inline error on rollback.
+Minimal: 120-160 ms fades and slides for drawers, toasts and row insertion. Respect `prefers-reduced-motion`. Optimistic rows appear with a subtle "pending" style (muted text and the word "Saving…", never colour alone) and settle in place; on rollback the row is removed again and the error is shown where the action was taken (the drawer), not as an inline row error.
 
 ## 9. Accessibility requirements that affect the visuals
 

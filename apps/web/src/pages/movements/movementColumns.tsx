@@ -31,7 +31,14 @@ export type MovementColumnsOptions = {
   onCopyId: (id: Id) => void;
   /** The id whose Copy ID just succeeded: its button shows a check for a moment. */
   copiedId: Id | undefined;
+  /**
+   * Movements still being saved. Their time is the server's to set, so the row says
+   * "Saving…" instead, and it has no Copy ID until the movement is stored.
+   */
+  savingIds: ReadonlySet<Id>;
 };
+
+export const SAVING_TEXT = 'Saving…';
 
 /**
  * Date above time, so the column stays narrow. Assistive technology reads one value,
@@ -66,6 +73,7 @@ export function movementColumns({
   userName,
   onCopyId,
   copiedId,
+  savingIds,
 }: MovementColumnsOptions): MovementColumn[] {
   return [
     {
@@ -73,7 +81,12 @@ export function movementColumns({
       header: 'Date/time',
       sortKey: 'createdAt',
       width: '6.75rem',
-      cell: dateTimeCell,
+      cell: (movement) =>
+        savingIds.has(movement.id) ? (
+          <span className={styles.saving}>{SAVING_TEXT}</span>
+        ) : (
+          dateTimeCell(movement)
+        ),
     },
     {
       id: 'type',
@@ -140,11 +153,13 @@ export function movementColumns({
       cell: (movement) => (
         <span className={styles.idCell}>
           <span className={styles.sku}>{shortId(movement.id)}</span>
-          <IconButton
-            icon={copiedId === movement.id ? Check : Copy}
-            label={`Copy ID ${movement.id}`}
-            onClick={() => onCopyId(movement.id)}
-          />
+          {savingIds.has(movement.id) ? null : (
+            <IconButton
+              icon={copiedId === movement.id ? Check : Copy}
+              label={`Copy ID ${movement.id}`}
+              onClick={() => onCopyId(movement.id)}
+            />
+          )}
         </span>
       ),
     },
