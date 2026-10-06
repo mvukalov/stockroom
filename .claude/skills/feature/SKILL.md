@@ -17,6 +17,7 @@ Manages a feature from spec to merged pull request.
 
 - `# Current Feature` — H1 with the feature name when active (`# Current Feature: Cart Drawer`)
 - `## Status` — Not Started | In Progress | In Review | Complete
+- `## Spec file` — repo-relative path of the loaded spec, or `none (inline description)`. Set by `load`, used by `complete`
 - `## Goals` — checkable bullet points of what success looks like
 - `## Notes` — constraints, decisions, links to specs and research docs
 - `## History` — completed features, oldest first (append only)
@@ -25,15 +26,15 @@ Manages a feature from spec to merged pull request.
 
 Execute the requested action: $ARGUMENTS
 
-| Action     | Description                                                             |
-| ---------- | ----------------------------------------------------------------------- |
-| `load`     | Load a feature spec (or inline description) into current-feature.md     |
-| `start`    | Create the branch and implement the goals                               |
-| `test`     | Optional. Write and run unit, component and E2E tests for the feature   |
-| `review`   | Optional. Check goals, quality, scope and tests against `git diff main` |
-| `explain`  | Optional. Explain what changed and how it fits together                 |
-| `export`   | Write a private learning doc to `process-notes/` (never committed)      |
-| `complete` | Commit, push, open a PR, merge after approval, clean up                 |
+| Action     | Description                                                                                  |
+| ---------- | -------------------------------------------------------------------------------------------- |
+| `load`     | Load a feature spec (or inline description) into current-feature.md and record the spec path |
+| `start`    | Create the branch and implement the goals                                                    |
+| `test`     | Optional. Write and run unit, component and E2E tests for the feature                        |
+| `review`   | Optional. Check goals, quality, scope and tests against `git diff main`                      |
+| `explain`  | Optional. Explain what changed and how it fits together                                      |
+| `export`   | Write a private learning doc to `process-notes/` (never committed)                           |
+| `complete` | Commit (plus the spec if still untracked), push, open a PR, merge after approval, clean up   |
 
 Order: `load` -> `start` -> `complete`. Between `start` and `complete`, `test` (optional), `explain` (optional) and `review` (optional) can run in any order.
 

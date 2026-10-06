@@ -10,6 +10,7 @@ Do not commit, push, open a PR or merge in this action. Do not ask me about comm
 3. If `current-feature.md` already has an active feature (Status is In Progress or In Review), stop and ask before overwriting it.
 4. Update current-feature.md:
    - H1: `# Current Feature: <Feature Name>`, using the spec's own title (`# Current Feature: Contract`)
+   - Spec file: the repo-relative path of the loaded spec (`context/features/001_01-contract-spec.md`), or `none (inline description)`. Add the `## Spec file` section after Status if it is missing. `/feature complete` uses this exact path.
    - Goals: the spec's requirements as checkable bullets
    - Notes: technical constraints, out-of-scope items, linked research docs and ADRs, any ADR contradiction found in step 2
    - Status: Not Started

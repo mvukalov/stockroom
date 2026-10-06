@@ -25,7 +25,7 @@ Specs live in `context/features/`; large features are split into phases. The spe
 
 - One branch per feature or fix: `feature/<name>`, `fix/<name>`.
 - Conventional commits: `feat:`, `fix:`, `chore:`, `test:`, `docs:`, `refactor:`.
-- `feature/` and `fix/` branches: committing, pushing and merging happen only inside `/feature complete`. Approving its step 2 is Martin's approval for the whole sequence.
+- `feature/` and `fix/` branches: committing, pushing and merging happen only inside `/feature complete`. Approving its step 2 is Martin's approval for the whole sequence. `/feature load` records the spec path as "Spec file"; if that file is still untracked, complete lists it as `Spec (docs): <path>` and commits it with the feature. Any other untracked file is only a warning and is committed only if Martin approves it by name.
 - `chore/` and `docs/` branches (changes outside a loaded feature): commit, push and open the PR only after Martin's explicit approval of the diff, and never merge them; Martin merges those.
 - Never commit before lint, typecheck, tests and build pass.
 - No "Generated with Claude" or co-author lines in commit messages.

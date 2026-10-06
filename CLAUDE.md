@@ -47,7 +47,7 @@ Quality gate before every commit: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `p
 ## Critical rules
 
 - English for code, comments, commits, docs, UI. Conversation with Martin is in Croatian.
-- `feature/` and `fix/` branches: commit, push and merge only inside `/feature complete`. Running `/feature complete` and approving its step 2 is Martin's approval for the whole sequence (commit, push, PR, merge).
+- `feature/` and `fix/` branches: commit, push and merge only inside `/feature complete`. Running `/feature complete` and approving its step 2 is Martin's approval for the whole sequence (commit, push, PR, merge). That approval includes the loaded spec (recorded by `/feature load` as "Spec file") when it is still untracked; any other untracked file is only shown as a warning and is committed only if Martin approves it by name.
 - `chore/` and `docs/` branches (changes outside a loaded feature): commit, push and open the PR only after Martin's explicit approval of the diff, and never merge them; Martin merges those.
 - Never delete files without Martin's explicit approval.
 - Commit messages: conventional commits, **no** "Generated with Claude" and **no** Co-Authored-By lines. PR descriptions: hand-written, no Claude footer.
