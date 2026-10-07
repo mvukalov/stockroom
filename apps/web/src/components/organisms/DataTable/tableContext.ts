@@ -11,6 +11,8 @@ export type ActiveFilter = {
   id: string;
   label: string;
   value: string;
+  /** The full value when `value` is shortened (e.g. a short id); shown on hover. */
+  title?: string;
   onRemove: () => void;
 };
 

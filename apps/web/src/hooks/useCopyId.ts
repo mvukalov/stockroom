@@ -2,14 +2,24 @@ import { useEffect, useRef, useState } from 'react';
 
 import type { Id } from '@stockroom/contract';
 
+import { shortId } from '../utils/shortId';
+
 /** The outcome of the last Copy ID, shown until it clears itself. */
 export type CopyStatus = { id: Id; outcome: 'copied' | 'failed' };
 
 /** How long the outcome stays on screen. */
 export const COPY_STATUS_MS = 4000;
 
+/** The outcome of the last Copy ID for a polite status line; `''` once it has cleared. */
+export function copyStatusText(status: CopyStatus | null): string {
+  if (status === null) return '';
+  return status.outcome === 'copied'
+    ? `Copied ID ${shortId(status.id)}`
+    : "Couldn't copy the ID: this browser does not allow clipboard access here.";
+}
+
 /**
- * Copies a movement id with the Clipboard API. The API can be missing (an insecure
+ * Copies a record id with the Clipboard API. The API can be missing (an insecure
  * origin) or refused (permissions); both report `failed` instead of failing silently.
  */
 export function useCopyId() {

@@ -25,7 +25,7 @@ function random(seed: number) {
 }
 
 /** A valid version 4 UUID from `n`; the same `n` gives the same id. */
-function fixtureId(n: number, salt: number): Id {
+export function fixtureId(n: number, salt: number): Id {
   const next = random(n * 7919 + salt);
   const hex = (length: number) =>
     Array.from({ length }, () => Math.floor(next() * 16).toString(16)).join('');

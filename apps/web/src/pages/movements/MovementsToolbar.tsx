@@ -7,18 +7,15 @@ import {
   type User,
 } from '@stockroom/contract';
 
-import { Button } from '../../components/atoms/Button/Button';
 import { Select } from '../../components/atoms/Select/Select';
 import { DateRangeFilter } from '../../components/molecules/DateRangeFilter/DateRangeFilter';
 import { MOVEMENT_TYPE_LABELS } from '../../components/molecules/MovementTypeBadge/movementTypeLabels';
+import {
+  OptionsNotice,
+  type OptionsState,
+} from '../../components/molecules/OptionsNotice/OptionsNotice';
 import type { MovementFilterKey } from './movementFilters';
 import styles from './MovementsView.module.scss';
-
-/** The options of one select that comes from the API. */
-export type OptionsState<T> =
-  | { status: 'loading' }
-  | { status: 'error'; onRetry: () => void }
-  | { status: 'ready'; data: readonly T[] };
 
 export type MovementFilterChange = <K extends MovementFilterKey>(
   key: K,
@@ -37,35 +34,6 @@ const optional = (value: string) => (value === '' ? undefined : value);
 function parseType(value: string): MovementType | undefined {
   const parsed = MovementType.safeParse(value);
   return parsed.success ? parsed.data : undefined;
-}
-
-type OptionsNoticeProps = {
-  id: string;
-  state: OptionsState<unknown>;
-  /** The filter's label, e.g. "Location" or "Created by". */
-  name: string;
-  /** Names the Retry button, e.g. "Retry loading locations". */
-  retryLabel: string;
-};
-
-/** Why a select is disabled: its options are loading or failed (with Retry). */
-function OptionsNotice({ id, state, name, retryLabel }: OptionsNoticeProps) {
-  if (state.status === 'ready') return null;
-  if (state.status === 'loading') {
-    return (
-      <p id={id} className={styles.optionsNotice}>
-        Loading {name} filter options…
-      </p>
-    );
-  }
-  return (
-    <div className={styles.optionsNotice}>
-      <span id={id}>{name} filter is unavailable.</span>
-      <Button variant="ghost" aria-label={retryLabel} onClick={state.onRetry}>
-        Retry
-      </Button>
-    </div>
-  );
 }
 
 /**

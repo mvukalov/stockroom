@@ -47,7 +47,7 @@ export function FilterChips({ filters }: { filters: readonly ActiveFilter[] }) {
       <ul className={styles.chipList}>
         {filters.map((filter) => (
           <li key={filter.id} className={styles.chip}>
-            <span>
+            <span title={filter.title}>
               {filter.label}: {filter.value}
             </span>
             <IconButton

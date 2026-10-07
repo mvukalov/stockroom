@@ -7,6 +7,7 @@ import {
 
 import type { Id, OrderDetail, OrdersQuery } from '@stockroom/contract';
 
+import { AUDIT_QUERY_KEY } from './audit';
 import { apiRequest, orThrow } from './client';
 import { DASHBOARD_QUERY_KEY } from './dashboard';
 import { PRODUCTS_QUERY_KEY } from './products';
@@ -91,6 +92,9 @@ export function useCancelOrder({
       }),
     onSuccess: async (result) => {
       if (!result.ok) return;
+      // The cancel is a new audit event. Reset, not invalidated: the log loads only
+      // its first page on the next visit instead of every loaded page (ADR-0006).
+      void queryClient.resetQueries({ queryKey: AUDIT_QUERY_KEY });
       // Awaited, so the mutation stays pending until the order on screen has
       // refetched: the dialog closes on the new status, never on a stale one.
       // Cancelling releases reserved stock, so availability and the dashboard change.
