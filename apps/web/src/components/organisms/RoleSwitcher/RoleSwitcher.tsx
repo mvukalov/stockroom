@@ -1,9 +1,13 @@
+import { Lock } from 'lucide-react';
 import { useId } from 'react';
 
 import type { Id, User } from '@stockroom/contract';
+import { isReadOnly } from '@stockroom/domain';
 
 import { Avatar } from '../../atoms/Avatar/Avatar';
+import { Badge } from '../../atoms/Badge/Badge';
 import { Button } from '../../atoms/Button/Button';
+import { Icon } from '../../atoms/Icon/Icon';
 import { Select } from '../../atoms/Select/Select';
 import { Skeleton } from '../../atoms/Skeleton/Skeleton';
 import { VisuallyHidden } from '../../atoms/VisuallyHidden/VisuallyHidden';
@@ -24,6 +28,7 @@ export type RoleSwitcherProps =
     };
 
 const LABEL = 'Demo user';
+const READ_ONLY_LABEL = 'Read-only access';
 
 /**
  * Demo control (phase 1, no real auth): picks the acting user, and with it the role
@@ -89,6 +94,18 @@ export function RoleSwitcher(props: RoleSwitcherProps) {
           <span className={styles.badge}>
             <RoleBadge role={currentUser.role} />
           </span>
+          {/* Every mutating control is disabled with its reason; this says why at a
+              glance. Narrow viewports keep the lock only, named for assistive technology. */}
+          {isReadOnly(currentUser) && (
+            <>
+              <Badge tone="neutral" icon={Lock} className={styles.readOnly}>
+                {READ_ONLY_LABEL}
+              </Badge>
+              <span className={styles.readOnlyCompact}>
+                <Icon icon={Lock} size="sm" label={READ_ONLY_LABEL} />
+              </span>
+            </>
+          )}
         </div>
       );
     }
