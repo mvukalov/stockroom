@@ -1,0 +1,35 @@
+// Sits on the top edge of a `position: relative` parent, so showing it never moves
+// the content below.
+.track {
+  position: absolute;
+  z-index: 1;
+  inset-inline: 0;
+  top: 0;
+  height: calc(var(--border-width) * 2);
+  overflow: hidden;
+  background-color: var(--color-nav-active-bg);
+}
+
+// A third of the width slides across. With reduced motion it is a full, still bar.
+.bar {
+  display: block;
+  width: 33%;
+  height: 100%;
+  background-color: var(--color-accent);
+  animation: progress var(--duration-skeleton) var(--easing-standard) infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    width: 100%;
+    animation: none;
+  }
+}
+
+@keyframes progress {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(300%);
+  }
+}

@@ -1,14 +1,11 @@
-import { Link } from 'react-router';
-
 import type { OrderSummary, OrdersQuery } from '@stockroom/contract';
 
-import { orderPath } from '../../app/routes';
 import { OrderStatusBadge } from '../../components/molecules/OrderStatusBadge/OrderStatusBadge';
 import type { ColumnDef } from '../../components/organisms/DataTable/columns';
 import { formatCents } from '../../utils/formatCents';
 import { formatCount } from '../../utils/formatCount';
 import { formatDateTime } from '../../utils/formatDateTime';
-import styles from './OrdersView.module.scss';
+import { OrderNumberLink } from './OrderNumberLink';
 
 /**
  * Order list columns. Sort keys are the `OrdersQuery` sort fields. The order number
@@ -24,11 +21,7 @@ export const ORDER_COLUMNS: readonly ColumnDef<
     sortKey: 'number',
     mono: true,
     hideable: false,
-    cell: (order) => (
-      <Link to={orderPath(order.id)} className={styles.numberLink}>
-        {order.number}
-      </Link>
-    ),
+    cell: (order) => <OrderNumberLink order={order} />,
   },
   {
     id: 'customer',

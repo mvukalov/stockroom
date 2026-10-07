@@ -61,7 +61,9 @@ export const appRoutes: RouteObject[] = [
           {
             path: ROUTES.orderDetail,
             element: <OrderDetailPage />,
-            handle: titled(({ id }) => `Order ${id ?? ''}`),
+            // The order number is known only once the order has loaded; the page
+            // passes it to `PageHeader` for the <h1> and the document title.
+            handle: titled('Order detail'),
           },
           {
             path: ROUTES.audit,

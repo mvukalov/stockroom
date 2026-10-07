@@ -1,0 +1,97 @@
+@use '../../styles/mixins';
+
+.region {
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface);
+}
+
+.table {
+  width: 100%;
+  // Four columns fit a 375 px screen, so the totals are in view without scrolling;
+  // long product titles wrap. Narrower than this, the region scrolls.
+  min-width: 20rem;
+  border-collapse: collapse;
+  font-size: var(--font-size-table-cell);
+
+  // Tight on a phone, so all four columns fit; the usual spacing from 768 px.
+  th,
+  td {
+    padding: var(--space-2);
+    text-align: start;
+    vertical-align: middle;
+
+    @include mixins.from-md {
+      padding-inline: var(--space-4);
+    }
+  }
+
+  thead th {
+    height: var(--table-row-height);
+    border-bottom: var(--border-width) solid var(--color-border);
+    background-color: var(--color-surface-subtle);
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+  }
+
+  td {
+    height: var(--table-row-height);
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  tfoot th {
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-medium);
+    text-align: end;
+  }
+
+  tfoot td {
+    border-bottom: 0;
+  }
+
+  tfoot tr:first-child > * {
+    border-top: var(--border-width) solid var(--color-border);
+  }
+
+  .number {
+    @include mixins.tabular-nums;
+
+    text-align: end;
+    white-space: nowrap;
+  }
+
+  .total > * {
+    color: var(--color-text);
+    font-weight: var(--font-weight-semibold);
+  }
+}
+
+.caption {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--border-width) solid var(--color-border);
+  font-size: var(--font-size-section-title);
+  font-weight: var(--font-weight-semibold);
+  text-align: start;
+}
+
+.title {
+  display: block;
+  min-height: 1lh;
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.sku {
+  display: block;
+  min-height: 1lh;
+  // A SKU is read as one token; the title above it wraps instead.
+  white-space: nowrap;
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+}
+
+.numberSkeleton {
+  margin-inline-start: auto;
+}
