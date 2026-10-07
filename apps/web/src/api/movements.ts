@@ -1,5 +1,4 @@
 import {
-  keepPreviousData,
   useInfiniteQuery,
   useMutation,
   useMutationState,
@@ -14,8 +13,14 @@ import {
 } from '@stockroom/contract';
 import { movementMatchesQuery } from '@stockroom/domain';
 
+import { AUDIT_QUERY_KEY } from './audit';
 import { apiRequest, orThrow } from './client';
 import { DASHBOARD_QUERY_KEY } from './dashboard';
+import {
+  INFINITE_LIST_OPTIONS,
+  INFINITE_LIST_PAGE_SIZE,
+  type WithoutPaging,
+} from './infiniteList';
 import {
   confirmedRow,
   firstPageOnly,
@@ -36,9 +41,6 @@ import { PRODUCTS_QUERY_KEY } from './products';
  */
 export const MOVEMENTS_QUERY_KEY = ['movements'] as const;
 
-/** Rows per request: the largest page size the contract allows. */
-export const MOVEMENTS_PAGE_SIZE = 100;
-
 /**
  * An infinite query refetches every loaded page one after another, so a refetch after
  * a long scroll is dozens of requests. Movements only change through this app (the
@@ -48,12 +50,7 @@ export const MOVEMENTS_PAGE_SIZE = 100;
 const MOVEMENTS_STALE_TIME_MS = 5 * 60 * 1000;
 
 /** The filters and sort of the list; `page` and `pageSize` mean nothing to it. */
-export type MovementsListQuery = Omit<MovementsQuery, 'page' | 'pageSize'>;
-
-export function movementsListQuery(query: MovementsQuery): MovementsListQuery {
-  const { page: _page, pageSize: _pageSize, ...listQuery } = query;
-  return listQuery;
-}
+export type MovementsListQuery = WithoutPaging<MovementsQuery>;
 
 /**
  * The movement history for a set of filters and a sort, loaded in pages of 100 as
@@ -71,18 +68,17 @@ export function useMovements(
       orThrow(
         await apiRequest('listMovements', {
           userId,
-          query: { ...query, page: pageParam, pageSize: MOVEMENTS_PAGE_SIZE },
+          query: {
+            ...query,
+            page: pageParam,
+            pageSize: INFINITE_LIST_PAGE_SIZE,
+          },
           signal,
         }),
       ),
-    initialPageParam: 1,
-    getNextPageParam: (last) =>
-      last.page * last.pageSize < last.total ? last.page + 1 : undefined,
+    ...INFINITE_LIST_OPTIONS,
     enabled: enabled && userId !== null,
-    placeholderData: keepPreviousData,
     staleTime: MOVEMENTS_STALE_TIME_MS,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
   });
 }
 
@@ -211,6 +207,9 @@ export function useCreateMovement() {
       const inserted = context?.inserted ?? [];
       if (result?.ok === true) {
         confirm(client, inserted, result.value, movement.labels);
+        // The movement is a new audit event. Reset, not invalidated: the log loads
+        // only its first page on the next visit instead of every loaded page.
+        void client.resetQueries({ queryKey: AUDIT_QUERY_KEY });
       } else {
         rollBack(client, inserted, movement.input.id);
       }

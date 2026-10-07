@@ -1,0 +1,10 @@
+// A full line under the filters, so it wraps below them at any width.
+.notice {
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}

@@ -13,8 +13,8 @@ import { Input } from '../../../components/atoms/Input/Input';
 import { Select } from '../../../components/atoms/Select/Select';
 import { ErrorBanner } from '../../../components/molecules/ErrorBanner/ErrorBanner';
 import { MOVEMENT_TYPE_LABELS } from '../../../components/molecules/MovementTypeBadge/movementTypeLabels';
+import type { OptionsState } from '../../../components/molecules/OptionsNotice/OptionsNotice';
 import { cx } from '../../../utils/cx';
-import type { OptionsState } from '../MovementsToolbar';
 import {
   FORM_FIELDS,
   movementFormResolver,

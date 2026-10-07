@@ -13,8 +13,8 @@ import { useCreateMovement } from '../../../api/movements';
 import type { MovementLabels } from '../../../api/movementsCache';
 import { useProducts } from '../../../api/products';
 import { useCurrentUser } from '../../../app/currentUser/currentUserContext';
+import type { OptionsState } from '../../../components/molecules/OptionsNotice/OptionsNotice';
 import { useDebouncedCallback } from '../../../hooks/useDebouncedCallback';
-import type { OptionsState } from '../MovementsToolbar';
 import {
   EMPTY_VALUES,
   toNewMovement,

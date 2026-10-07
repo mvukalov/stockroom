@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ENDPOINTS, type MovementListItem } from '@stockroom/contract';
 
+import { USERS_QUERY_KEY } from '../api/users';
 import { DEMO_USER_STORAGE_KEY } from '../app/currentUser/CurrentUserProvider';
 import { DATE_RANGE_MESSAGE } from '../components/molecules/DateRangeFilter/DateRangeFilter';
 import { setMockConfig } from '../mocks/config';
@@ -414,6 +415,47 @@ describe('MovementsPage', () => {
         name: `Remove filter Location: ${location.id}`,
       }),
     ).toBeInTheDocument();
+  });
+
+  it('keeps the loaded rows and requests no further page while the users fail; after Retry the next page loads', async () => {
+    const requests = recordMovementRequests();
+    const { queryClient, user } = renderApp('/movements');
+    await rowsLoaded();
+    const loadedRows = dataRows().length;
+
+    // The users request fails from now on, so there is no acting user to ask as.
+    server.use(
+      http.get(ENDPOINTS.listUsers.path, () =>
+        HttpResponse.json(null, { status: 500 }),
+      ),
+    );
+    queryClient.resetQueries({ queryKey: USERS_QUERY_KEY }).catch(() => {});
+    const banner = await waitFor(() => {
+      const found = screen
+        .getAllByRole('alert')
+        .find((alert) => alert.textContent?.includes(MOVEMENTS_LOAD_ERROR));
+      if (!found) throw new Error('No movements banner yet');
+      return found;
+    });
+    expect(dataRows()).toHaveLength(loadedRows);
+
+    // The end of the list asks for nothing. Half a second is long enough for a loop
+    // of failing requests to show.
+    scrollTo(scrollBox(), 85 * ROW_HEIGHT);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    expect(requests.map((r) => r.page)).toEqual(['1']);
+
+    // The banner's Retry asks for the users again; with a user, the end of the list
+    // in view loads the next page, once.
+    server.resetHandlers();
+    await user.click(within(banner).getByRole('button', { name: 'Retry' }));
+    await waitFor(() => expect(lastRowIndex()).toBeGreaterThan(101));
+    expect(requests.map((r) => r.page)).toEqual(['1', '2']);
+    expect(
+      screen
+        .queryAllByRole('alert')
+        .filter((alert) => alert.textContent?.includes(MOVEMENTS_LOAD_ERROR)),
+    ).toEqual([]);
   });
 
   it('copies the full id and says so, or says why it could not', async () => {

@@ -1,15 +1,8 @@
-import { CalendarX2, Info, SearchX } from 'lucide-react';
+import { CalendarX2, SearchX } from 'lucide-react';
 
-import type {
-  Id,
-  Location,
-  MovementListItem,
-  MovementsQuery,
-  User,
-} from '@stockroom/contract';
+import type { AuditLogEntry, AuditQuery, User } from '@stockroom/contract';
 
 import { Button } from '../../components/atoms/Button/Button';
-import { Icon } from '../../components/atoms/Icon/Icon';
 import { VisuallyHidden } from '../../components/atoms/VisuallyHidden/VisuallyHidden';
 import { EmptyState } from '../../components/molecules/EmptyState/EmptyState';
 import { ErrorBanner } from '../../components/molecules/ErrorBanner/ErrorBanner';
@@ -19,40 +12,37 @@ import { VirtualTable } from '../../components/organisms/VirtualTable/VirtualTab
 import { copyStatusText, type CopyStatus } from '../../hooks/useCopyId';
 import type { InfiniteListError } from '../../hooks/useInfiniteListState';
 import { isDateRangeInvalid } from '../../utils/dateRange';
-import { MOVEMENTS_MIN_WIDTH, movementColumns } from './movementColumns';
-import { movementFilterChips, type MovementFilterKey } from './movementFilters';
-import {
-  MovementsToolbar,
-  type MovementFilterChange,
-} from './MovementsToolbar';
-import { movementCount } from './movementText';
-import styles from './MovementsView.module.scss';
+import { AUDIT_MIN_WIDTH, auditColumns } from './auditColumns';
+import { auditFilterChips, type AuditFilterKey } from './auditFilters';
+import { eventCount } from './auditText';
+import { AuditToolbar, type AuditFilterChange } from './AuditToolbar';
+import styles from './AuditView.module.scss';
 
-export const MOVEMENTS_LOAD_ERROR =
-  "We couldn't load movements. Check your connection and try again.";
+export const AUDIT_LOAD_ERROR =
+  "We couldn't load the audit log. Check your connection and try again.";
 
-export const MOVEMENTS_DESCRIPTION =
-  'Append-only history of every stock change.';
+export const AUDIT_DESCRIPTION =
+  'Append-only record of every change. Events cannot be edited or deleted.';
 
 export const END_OF_HISTORY = 'End of history';
 
 /** Under the page title: the count once data has arrived, then the description. */
-export function MovementsSummary({ total }: { total: number | undefined }) {
+export function AuditSummary({ total }: { total: number | undefined }) {
   return (
     <>
       {total !== undefined && (
-        <p className={styles.count}>{movementCount(total)}</p>
+        <p className={styles.count}>{eventCount(total)}</p>
       )}
-      <p>{MOVEMENTS_DESCRIPTION}</p>
+      <p>{AUDIT_DESCRIPTION}</p>
     </>
   );
 }
 
-export type MovementsViewProps = {
+export type AuditViewProps = {
   /** The parsed URL state: filters and sort. */
-  query: MovementsQuery;
-  /** Every loaded row; `undefined` until the first page arrives. */
-  rows: readonly MovementListItem[] | undefined;
+  query: AuditQuery;
+  /** Every loaded event; `undefined` until the first page arrives. */
+  rows: readonly AuditLogEntry[] | undefined;
   total: number | undefined;
   hasMore: boolean;
   isLoadingMore: boolean;
@@ -60,23 +50,20 @@ export type MovementsViewProps = {
   isRefreshing: boolean;
   onLoadMore: () => void;
   error: InfiniteListError | undefined;
-  locations: OptionsState<Location>;
   users: OptionsState<User>;
-  onFilterChange: MovementFilterChange;
+  onFilterChange: AuditFilterChange;
   onClearFilters: () => void;
-  onSortChange: (sort: MovementsQuery['sort']) => void;
+  onSortChange: (sort: AuditQuery['sort']) => void;
   /** Identifies the list (filters and sort); a new one scrolls to the top. */
   listKey: string;
-  /** Polite announcement after a filter or sort change, e.g. "Showing 100 of 48,213 movements". */
+  /** Polite announcement after a filter or sort change, e.g. "Showing 100 of 52,964 events". */
   announcement: string;
   copyStatus: CopyStatus | null;
-  onCopyId: (id: Id) => void;
-  /** Movements still being saved: their rows say "Saving…" and have no Copy ID yet. */
-  savingIds: ReadonlySet<Id>;
+  onCopyId: (id: string) => void;
 };
 
-/** The movement history below the page header. Props only; `MovementsPage` picks the state. */
-export function MovementsView({
+/** The audit log below the page header. Props only; `AuditPage` picks the state. */
+export function AuditView({
   query,
   rows,
   total,
@@ -85,7 +72,6 @@ export function MovementsView({
   isRefreshing,
   onLoadMore,
   error,
-  locations,
   users,
   onFilterChange,
   onClearFilters,
@@ -94,15 +80,10 @@ export function MovementsView({
   announcement,
   copyStatus,
   onCopyId,
-  savingIds,
-}: MovementsViewProps) {
-  const options = {
-    locations: locations.status === 'ready' ? locations.data : undefined,
-    users: users.status === 'ready' ? users.data : undefined,
-  };
-  const removeFilter = (key: MovementFilterKey) =>
-    onFilterChange(key, undefined);
-  const chips = movementFilterChips(query, options).map((chip) => ({
+}: AuditViewProps) {
+  const userList = users.status === 'ready' ? users.data : undefined;
+  const removeFilter = (key: AuditFilterKey) => onFilterChange(key, undefined);
+  const chips = auditFilterChips(query, userList).map((chip) => ({
     ...chip,
     onRemove: () => removeFilter(chip.id),
   }));
@@ -111,12 +92,11 @@ export function MovementsView({
   const isFirstLoad =
     rows === undefined && error === undefined && !rangeInvalid;
 
-  const userNames = new Map(options.users?.map((u) => [u.id, u.name]));
-  const columns = movementColumns({
+  const userNames = new Map(userList?.map((u) => [u.id, u.name]));
+  const columns = auditColumns({
     userName: (id) => userNames.get(id),
     onCopyId,
     copiedId: copyStatus?.outcome === 'copied' ? copyStatus.id : undefined,
-    savingIds,
   });
 
   const clearButton = <Button onClick={onClearFilters}>Clear filters</Button>;
@@ -141,9 +121,9 @@ export function MovementsView({
         columns={columns}
         rows={rows}
         total={total}
-        getRowId={(movement) => movement.id}
-        caption="Stock movements"
-        minWidth={MOVEMENTS_MIN_WIDTH}
+        getRowId={(entry) => entry.id}
+        caption="Audit events"
+        minWidth={AUDIT_MIN_WIDTH}
         sort={query.sort}
         onSortChange={onSortChange}
         hasMore={hasMore}
@@ -157,12 +137,12 @@ export function MovementsView({
           hasFilters ? (
             <EmptyState
               icon={SearchX}
-              title="No movements match your filters"
+              title="No events match your filters"
               description="Try removing a filter or widening the date range."
               action={clearButton}
             />
           ) : (
-            <EmptyState title="No movements yet" />
+            <EmptyState title="No audit events yet" />
           )
         }
       />
@@ -171,25 +151,17 @@ export function MovementsView({
 
   return (
     <>
-      <p className={styles.notice}>
-        <Icon icon={Info} />
-        <span>
-          Movements cannot be edited. To correct a mistake, add an{' '}
-          <strong>ADJUSTMENT</strong>.
-        </span>
-      </p>
       {/* Always mounted, so a change is announced: the first load, then the count
           after a filter or sort change (never after a scroll fetch). */}
       <VisuallyHidden>
-        <output>{isFirstLoad ? 'Loading movements…' : announcement}</output>
+        <output>{isFirstLoad ? 'Loading audit log…' : announcement}</output>
       </VisuallyHidden>
-      <section aria-label="Movement results" className={styles.results}>
+      <section aria-label="Audit results" className={styles.results}>
         <div className={styles.toolbar}>
           <div className={styles.toolbarRow}>
             <div className={styles.filters}>
-              <MovementsToolbar
+              <AuditToolbar
                 query={query}
-                locations={locations}
                 users={users}
                 onFilterChange={onFilterChange}
               />
@@ -209,7 +181,7 @@ export function MovementsView({
         {error !== undefined && (
           <div className={styles.message}>
             <ErrorBanner
-              message={MOVEMENTS_LOAD_ERROR}
+              message={AUDIT_LOAD_ERROR}
               action={<Button onClick={error.onRetry}>Retry</Button>}
             />
           </div>
