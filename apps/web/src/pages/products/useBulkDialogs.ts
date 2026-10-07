@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { BulkProductsInput, Id } from '@stockroom/contract';
 
 import { useBulkProducts } from '../../api/products';
+import { useAppDispatch } from '../../app/store';
+import { toastShown } from '../../app/toasts/toastsSlice';
 import { BULK_SAVE_ERROR } from './bulkActions';
 import type { BulkDialogKind } from './ProductsView';
 
@@ -11,12 +13,32 @@ type OpenDialog = { kind: BulkDialogKind; ids: Id[] };
 /**
  * Update category and Archive: one dialog at a time, the mutation behind it, and
  * the message about the last success. The dialog stays open on every failure.
+ *
+ * On the page the message is the page's `<output>` (`onSuccess`). A user who left
+ * the page while the request was pending gets it as a toast instead: the page and
+ * its `mutate` callback are gone, the mutation's own callback is not.
  */
 export function useBulkDialogs(
   userId: Id | null,
   onSuccess: (message: string) => void,
 ) {
-  const mutation = useBulkProducts();
+  const dispatch = useAppDispatch();
+  // The success message of the request in flight, set by `submit`.
+  const pendingMessage = useRef('');
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  const mutation = useBulkProducts({
+    onUpdated: () => {
+      if (!mounted.current) {
+        dispatch(toastShown({ message: pendingMessage.current }));
+      }
+    },
+  });
   const [dialog, setDialog] = useState<OpenDialog | null>(null);
   const [categoryId, setCategoryId] = useState('');
   // Where focus goes when the dialog closes: its opener, or the results after a success.
@@ -47,6 +69,7 @@ export function useBulkDialogs(
     focusAfter: HTMLElement | null,
   ) => {
     if (mutation.isPending) return;
+    pendingMessage.current = message;
     mutation.mutate(
       { userId, body },
       {
