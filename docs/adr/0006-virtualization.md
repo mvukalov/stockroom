@@ -57,3 +57,19 @@ C. **Sparse windowed fetching.** The virtualizer has `total` rows; the scrollbar
 ## Note (2026-10-06, New movement drawer, spec 004_02)
 
 "Resets the query to its first page" is refined: a confirmed new movement stays in place in a list that already shows it (newest first, filters matching), with the same id, so neither a refetch nor a scroll jump follows. Only a list that should hold the movement but could not show it at the top (another sort) keeps its first page alone and is refetched, one request instead of one per loaded page. Rows added or removed above the first row move the scroll position by their height when the list is scrolled, so the rows in view stay still.
+
+## Revisit (2026-10-07, Audit log, spec 006_01)
+
+The second virtualized list. Facts from the diff of that feature:
+
+- **Shared as it was:** `VirtualTable` with no change to its code or props (sticky header, `aria-rowcount`/`aria-rowindex`, focused row kept, end skeletons, reset to the top), `ColumnDef`/`SortHeader` through `VirtualColumnDef`, `FilterChips`, `DateRangeFilter` and `isDateRangeInvalid`, `EmptyState`, `ErrorBanner`, `useTableSearchParams`.
+- **Extracted from Movements, which now uses them with its existing tests unchanged (one test added for the fix below):**
+  - `api/infiniteList.ts`: the page size of 100, `withoutPaging` and the options every infinite list shares (first page, next page while `page × pageSize < total`, previous rows kept, no refetch on focus or reconnect). Each list keeps its own key, request and stale time.
+  - `hooks/useInfiniteListState.ts`: loaded rows and total, the refresh state, the error scoped to the list or to the next page, Load more without cancelling a request in flight, and the announcement after a filter or sort change. This was the only logic the two pages would have repeated line for line.
+  - A bug fix in the same hook, which changes Movements too: without an acting user (the users request failed), Load more used to request the next page without a user in a loop. It now asks for nothing while no request can be sent (`canFetch`), and waits one commit after a user is back, because TanStack Query applies the query's new options in an effect of the page, after the list's near-end effect.
+  - `OptionsState`/`OptionsNotice` (a molecule now) and `useCopyId`/`copyStatusText` (in `hooks/`), moved out of `pages/movements/`.
+  - One generic addition outside `VirtualTable`: an optional `title` on a filter chip, so a shortened value (the Record id) can show the full one.
+- **Copied on purpose:** the list card and toolbar layout (`AuditView.module.scss` repeats the card, toolbar, filter and copy status rules of `MovementsView.module.scss`), the view's frame around the table (toolbar row with Clear filters, chips, error banner, the invalid-range state, filtered and unfiltered empty states), the ID cell with Copy ID, and the `useInfiniteQuery` call of each list hook. The frame and the empty states are what `DataTable` provides as `Table.Toolbar` and `Table.Empty`, but those read `DataTable`'s context, so a `VirtualTable` page cannot use them; with two lists the copy is shorter than a new shared part, and it differs in filters and wording.
+- **Freshness:** an action that adds an audit event (a movement, an order cancel) calls `resetQueries` on the audit key instead of invalidating it: an inactive log loads only its first page on the next visit instead of every page it had loaded.
+
+Conclusion: a second list needed nothing new from `VirtualTable`. Sorting is already shared through `SortHeader`. The part both virtualized lists rebuilt is the frame `DataTable` has as compound parts (toolbar with Clear filters and chips, filtered empty state). That is the evidence for a later decision to give `VirtualTable` its own toolbar and empty parts if a third virtualized list appears. It is not decided here.

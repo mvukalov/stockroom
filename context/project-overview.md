@@ -145,7 +145,7 @@ Stock reservation is decided in ADR-0003 (availability is derived: on hand minus
 
 ### Wave 2 (still phase 1, after wave 1 is green)
 
-- Audit log view (same `DataTable` over movements and order events; cheap)
+- Audit log view (virtualized `VirtualTable` with infinite loading over movement, order and role events, like the movement history)
 - Dashboard movement chart (lowest ad demand, last item, first to cut)
 - Extra e2e and a11y coverage, Storybook completeness, static deploy polish
 
