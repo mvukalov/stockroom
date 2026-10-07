@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import { APP_NAME } from '../../../app/pageTitle';
 import styles from './PageTitle.module.scss';
@@ -11,18 +11,22 @@ import styles from './PageTitle.module.scss';
  *
  * `children` go under the `<h1>`, e.g. a short description and a result count.
  * `actions` sit at the end of the row, e.g. the page's primary button.
+ * `headingRef` lets a page move focus to the `<h1>` itself, e.g. after an action
+ * whose button is now disabled.
  */
 export function PageTitle({
   title,
   children,
   actions,
+  headingRef,
 }: {
   title: string;
   children?: ReactNode;
   actions?: ReactNode;
+  headingRef?: Ref<HTMLHeadingElement> | undefined;
 }) {
   const heading = (
-    <h1 tabIndex={-1} className={styles.heading}>
+    <h1 ref={headingRef} tabIndex={-1} className={styles.heading}>
       {title}
     </h1>
   );

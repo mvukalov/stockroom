@@ -8,6 +8,8 @@ export const APP_NAME = 'Stockroom';
  *
  * The top bar always shows the route's section. On RouteErrorPage the `<h1>` and the
  * document title say "Something went wrong" instead, so there they differ on purpose.
+ * The order detail does the same once its order has loaded: the `<h1>` and the
+ * document title show the order number (`PageHeader` `title`).
  */
 export type RouteHandle = { title: string | ((params: Params) => string) };
 

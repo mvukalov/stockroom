@@ -224,6 +224,15 @@ export const orderHandlers = [
     if (!body.ok) return body.error;
     const { to } = body.value;
 
+    // Cancelling is idempotent, so a Retry after a lost response is safe: an order
+    // that is already cancelled comes back unchanged, with no second audit entry.
+    if (to === 'CANCELLED' && order.status === 'CANCELLED') {
+      return respond(
+        ENDPOINTS.transitionOrder.response,
+        toOrderDetail(db, order),
+      );
+    }
+
     const result = transitionOrder(order, to, {
       userId: user.value.id,
       at: db.now(),

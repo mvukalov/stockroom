@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { computeOrderTotals } from './orderTotals';
+import { computeOrderTotals, lineTotalCents } from './orderTotals';
 
 const line = (quantity: number, unitPriceCents: number) => ({
   quantity,
@@ -49,5 +49,17 @@ describe('computeOrderTotals', () => {
     for (const value of Object.values(totals)) {
       expect(Number.isInteger(value)).toBe(true);
     }
+  });
+});
+
+describe('lineTotalCents', () => {
+  it('multiplies the quantity by the price snapshot', () => {
+    expect(lineTotalCents(line(4, 12_900))).toBe(51_600);
+  });
+
+  it('sums to the subtotal', () => {
+    const lines = [line(2, 1299), line(1, 4550), line(10, 85)];
+    const sum = lines.reduce((total, l) => total + lineTotalCents(l), 0);
+    expect(sum).toBe(computeOrderTotals(lines).subtotalCents);
   });
 });

@@ -1,0 +1,57 @@
+.view {
+  min-width: 0;
+}
+
+// The progress bar sits on its top edge, so showing it never moves the content.
+.content {
+  position: relative;
+  display: grid;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.headerStatus {
+  justify-self: start;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.link {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+
+  &:hover {
+    color: var(--color-accent-hover);
+  }
+}
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+  font-size: var(--font-size-body);
+}
+
+.noticeIcon {
+  flex-shrink: 0;
+  margin-top: 0.15em;
+}

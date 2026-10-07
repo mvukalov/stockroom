@@ -24,7 +24,8 @@ describe('routes', () => {
     [ROUTES.products, 'Products'],
     [ROUTES.movements, 'Movements'],
     [ROUTES.orders, 'Orders'],
-    [orderPath(ORDER_ID), `Order ${ORDER_ID}`],
+    // An unknown order: the route title stays, the page says "Order not found".
+    [orderPath(ORDER_ID), 'Order detail'],
     [ROUTES.audit, 'Audit log'],
     ['/no-such-page', 'Page not found'],
   ])(
@@ -41,13 +42,11 @@ describe('routes', () => {
     },
   );
 
-  it('shows the order id from the URL on the order detail placeholder', async () => {
+  it('shows "Order not found" on the order detail for an unknown id', async () => {
     renderApp(orderPath(ORDER_ID));
 
     const main = await screen.findByRole('main');
-    expect(
-      within(main).getByText(ORDER_ID, { selector: 'code' }),
-    ).toBeVisible();
+    expect(await within(main).findByText('Order not found')).toBeVisible();
   });
 
   it('shows "Page not found" inside the shell for an unknown path', async () => {

@@ -1,4 +1,4 @@
-import { act, cleanup, screen, within } from '@testing-library/react';
+import { act, cleanup, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { ROUTES } from '../../../app/routes';
@@ -121,8 +121,10 @@ describe('focus after navigation', () => {
     const { router } = renderApp(ROUTES.dashboard);
     await h1('Dashboard');
 
+    // Outside `act`, the <h1> can be found before the shell's focus effect has run.
     await router.navigate('/no-such-page');
-    expect(await h1('Page not found')).toHaveFocus();
+    const heading = await h1('Page not found');
+    await waitFor(() => expect(heading).toHaveFocus());
   });
 });
 
