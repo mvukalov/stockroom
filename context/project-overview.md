@@ -118,7 +118,7 @@ These are the rules the prototype settled. The domain package must enforce them 
 - Read-only. Event types: movement created, order status changed, order edited, role changed. It contains more events than the movements list (movements plus order and user events).
 - Audit entries must be consistent with current data: the order status in an event matches the order's real status path, and "order edited" events exist only for orders that were in `DRAFT` when edited.
 
-**Permissions** (pure function `(user, action, resource) -> boolean`)
+**Permissions** (pure function `(user, action) -> boolean`)
 - `ADMIN`: everything, including creating products.
 - `CLERK`: create stock movements, create and edit orders, move orders through the status flow.
 - `VIEWER`: read-only. Every mutating control stays visible but is disabled with the explanation "Your role is read-only", plus a "Read-only access" badge in the top bar. Navigation, filters, sorting and Export CSV remain available.
@@ -187,7 +187,7 @@ Not prototyped, specified by text only: the VIEWER pass (rules above), a narrow-
 - Contract first: Zod schemas are the single source of truth for types, mocks and validation.
 - The domain package has no React and no browser APIs.
 - Mutations are idempotent: client-generated IDs make retries and optimistic updates safe.
-- Permissions are a pure function `(user, action, resource) -> boolean`, reused by UI guards and later by the API.
+- Permissions are a pure function `(user, action) -> boolean`, reused by UI guards and later by the API.
 - URL filters are parsed from `useSearchParams` through a Zod schema from `packages/contract`.
 - Every significant decision gets an ADR.
 

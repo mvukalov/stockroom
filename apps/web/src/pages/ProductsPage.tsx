@@ -160,6 +160,7 @@ export function ProductsPage() {
         categoryId={bulk.categoryId}
         onCategoryChange={bulk.setCategoryId}
         pending={bulk.pending}
+        roleReason={reasonFor('product.update')}
         error={bulk.error}
         onSubmit={() => {
           if (bulk.dialog === null || bulk.categoryId === '') return;
@@ -180,6 +181,7 @@ export function ProductsPage() {
         open={bulk.dialog?.kind === 'archive'}
         count={dialogCount}
         pending={bulk.pending}
+        roleReason={reasonFor('product.archive')}
         error={bulk.error}
         onConfirm={() => {
           if (bulk.dialog === null) return;

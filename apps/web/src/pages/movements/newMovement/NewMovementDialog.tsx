@@ -17,6 +17,11 @@ export type NewMovementDialogProps = Omit<
   returnFocus: HTMLElement | null;
   /** The last attempt got no answer: the primary action becomes Retry. */
   canRetry: boolean;
+  /**
+   * Why the acting user may not do this, or `undefined`. Checked again while the
+   * dialog is open, so a user who lost the permission cannot submit.
+   */
+  roleReason: string | undefined;
 };
 
 /** The New movement drawer: the form between a fixed title and a fixed footer. */
@@ -25,6 +30,7 @@ export function NewMovementDialog({
   onDismiss,
   returnFocus,
   canRetry,
+  roleReason,
   pending,
   ...formProps
 }: NewMovementDialogProps) {
@@ -54,7 +60,7 @@ export function NewMovementDialog({
             type="submit"
             form={formId}
             variant="primary"
-            disabledReason={savingReason}
+            disabledReason={savingReason ?? roleReason}
           >
             {primaryLabel}
           </Button>

@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import { Role } from '@stockroom/contract';
 
-import { ACTIONS, can, denialReason, type Action } from './permissions';
+import {
+  ACTIONS,
+  can,
+  denialReason,
+  isReadOnly,
+  type Action,
+} from './permissions';
 
 // Written out from the spec table, independently of PERMISSIONS.
 const EXPECTED: Record<Action, Record<Role, boolean>> = {
@@ -45,5 +51,23 @@ describe('denialReason', () => {
     } else {
       expect(reason).toBe('Only an admin can do this');
     }
+  });
+});
+
+describe('isReadOnly', () => {
+  it.each(Role.options)('%s', (role) => {
+    // Read-only means every allowed action is `view` or `export` in the table above.
+    const writes = ACTIONS.filter(
+      (action) => action !== 'view' && action !== 'export',
+    );
+    expect(isReadOnly({ role })).toBe(
+      writes.every((action) => !EXPECTED[action][role]),
+    );
+  });
+
+  it('holds for VIEWER only', () => {
+    expect(Role.options.filter((role) => isReadOnly({ role }))).toEqual([
+      'VIEWER',
+    ]);
   });
 });

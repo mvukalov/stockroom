@@ -70,20 +70,27 @@ export type BulkProductsVariables = {
  * contract error (FORBIDDEN, NOT_FOUND, CONFLICT) is a value the dialog shows, and
  * only an unexpected failure (network, HTTP 500) puts the mutation in its error
  * state. Both actions are idempotent, so retrying with the same variables is safe.
+ *
+ * `onUpdated` runs here, in the mutation's own `onSuccess`, not in a `mutate`
+ * callback: TanStack skips `mutate` callbacks once the calling component has
+ * unmounted, and the user may have left the page while the request was pending.
  */
-export function useBulkProducts() {
+export function useBulkProducts({
+  onUpdated,
+}: { onUpdated?: () => void } = {}) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ userId, body }: BulkProductsVariables) =>
       apiRequest('bulkProducts', { userId, body }),
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       if (!result.ok) return;
-      // Returned, so the mutation stays pending until the list on screen has
+      // Awaited, so the mutation stays pending until the list on screen has
       // refetched. Archiving also changes the dashboard's stock figures.
-      return Promise.all([
+      await Promise.all([
         queryClient.invalidateQueries({ queryKey: PRODUCTS_QUERY_KEY }),
         queryClient.invalidateQueries({ queryKey: DASHBOARD_QUERY_KEY }),
       ]);
+      onUpdated?.();
     },
   });
 }

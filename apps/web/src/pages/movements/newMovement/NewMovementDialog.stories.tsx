@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn, userEvent, within } from 'storybook/test';
 
+import { READ_ONLY_REASON } from '@stockroom/domain';
+
 import { MOVEMENT_LOCATIONS } from '../movementsFixtures';
 import { newDraft, type ProductChoice } from './movementForm';
 import { NewMovementDialog } from './NewMovementDialog';
@@ -48,6 +50,7 @@ const meta = {
     returnFocus: null,
     canRetry: false,
     pending: false,
+    roleReason: undefined,
     draft: draft(),
     locations: { status: 'ready', data: MOVEMENT_LOCATIONS },
     productSearch: {
@@ -111,6 +114,11 @@ export const ValidationErrors: Story = {
 /** Saving: fields and buttons wait, Escape does nothing. */
 export const Pending: Story = {
   args: { draft: draft(filled), pending: true },
+};
+
+/** The role lost the permission while the drawer was open: Save is disabled with the reason, the draft stays. */
+export const ReadOnlyRole: Story = {
+  args: { draft: draft(filled), roleReason: READ_ONLY_REASON },
 };
 
 /** No answer from the server: the form keeps its data and the primary action is Retry. */

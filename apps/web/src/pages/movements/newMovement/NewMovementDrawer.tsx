@@ -7,6 +7,7 @@ import {
   type Location,
   type StockMovement,
 } from '@stockroom/contract';
+import { denialReason } from '@stockroom/domain';
 
 import { useLocations } from '../../../api/locations';
 import { useCreateMovement } from '../../../api/movements';
@@ -62,6 +63,11 @@ export function NewMovementDrawer({
 }: NewMovementDrawerProps) {
   const { currentUser } = useCurrentUser();
   const userId = currentUser?.id ?? null;
+  // Checked while the drawer is open too: a user who lost the permission cannot save.
+  const roleReason =
+    currentUser === undefined
+      ? 'Choose a user first'
+      : (denialReason(currentUser, 'movement.create') ?? undefined);
   const locationsQuery = useLocations(userId);
   const { mutateAsync, isPending } = useCreateMovement();
   const [submitError, setSubmitError] = useState<SubmitError>();
@@ -122,7 +128,9 @@ export function NewMovementDrawer({
   );
 
   const submit = async (input: CreateMovementInput, product: ProductChoice) => {
-    if (isPending || currentUser === undefined) return;
+    if (isPending || currentUser === undefined || roleReason !== undefined) {
+      return;
+    }
     const movement = toNewMovement(
       input,
       product,
@@ -159,6 +167,7 @@ export function NewMovementDrawer({
       onDismiss={dismiss}
       returnFocus={returnFocus}
       canRetry={canRetry}
+      roleReason={roleReason}
       pending={isPending}
       // Never shown without a draft: the form renders only while open.
       draft={draft ?? { id: '', values: EMPTY_VALUES }}

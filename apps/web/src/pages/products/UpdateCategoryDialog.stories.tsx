@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
+import { READ_ONLY_REASON } from '@stockroom/domain';
+
 import { BULK_SAVE_ERROR } from './bulkActions';
 import { PRODUCT_FILTER_OPTIONS } from './productsFixtures';
 import { UpdateCategoryDialog } from './UpdateCategoryDialog';
@@ -15,6 +17,7 @@ const meta = {
     categoryId: '',
     onCategoryChange: fn(),
     pending: false,
+    roleReason: undefined,
     error: undefined,
     onSubmit: fn(),
     onDismiss: fn(),
@@ -31,6 +34,11 @@ const SAFETY = PRODUCT_FILTER_OPTIONS.categories[2]?.id ?? '';
 export const Default: Story = {};
 
 export const CategoryChosen: Story = { args: { categoryId: SAFETY } };
+
+/** The role lost the permission while the dialog was open: the primary action is disabled with the reason. */
+export const ReadOnlyRole: Story = {
+  args: { categoryId: SAFETY, roleReason: READ_ONLY_REASON },
+};
 
 /** Saving: both buttons ignore clicks, Escape does nothing. */
 export const Pending: Story = { args: { categoryId: SAFETY, pending: true } };

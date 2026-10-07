@@ -27,6 +27,7 @@ export const Admin: Story = {};
 
 export const Clerk: Story = { args: { currentUser: STORY_CLERK } };
 
+/** A role that can only read also shows the Read-only access badge. */
 export const Viewer: Story = { args: { currentUser: STORY_VIEWER } };
 
 export const Loading: Story = { args: { status: 'loading' } };

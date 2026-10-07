@@ -5,6 +5,7 @@ import { ENDPOINTS, type Product, type Role } from '@stockroom/contract';
 
 import { DASHBOARD_QUERY_KEY } from '../api/dashboard';
 import { DEMO_USER_STORAGE_KEY } from '../app/currentUser/CurrentUserProvider';
+import { ROUTES } from '../app/routes';
 import { setMockConfig } from '../mocks/config';
 import { getDb } from '../mocks/db';
 import { archiveConflictMessage } from '../mocks/handlers/catalog';
@@ -18,6 +19,8 @@ const server = setupMockServer();
 afterEach(() => vi.restoreAllMocks());
 
 const table = () => screen.getByRole('table', { name: 'Products' });
+const notifications = () =>
+  screen.getByRole('status', { name: 'Notifications' });
 const results = () => screen.getByRole('region', { name: 'Product results' });
 const button = (name: string | RegExp) => screen.getByRole('button', { name });
 const queryDialog = () => screen.queryByRole('dialog');
@@ -415,6 +418,50 @@ describe('outcome message', () => {
     await user.click(checkboxFor(b));
     expect(screen.queryByText('1 product archived')).not.toBeInTheDocument();
   });
+
+  it('is the page message, not a toast, while the user stays on the page', async () => {
+    const { user } = await renderProducts();
+    const [a] = archivableOnFirstPage(1);
+    if (!a) throw new Error('unreachable');
+
+    await user.click(checkboxFor(a));
+    await user.click(button('Archive'));
+    await user.click(within(dialog()).getByRole('button', { name: 'Archive' }));
+
+    expect(await screen.findByText('1 product archived')).toBeInTheDocument();
+    expect(
+      within(notifications()).queryByText('1 product archived'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('becomes a toast when the user leaves the page while the request is pending', async () => {
+    const { user, router } = await renderProducts();
+    const [a] = archivableOnFirstPage(1);
+    if (!a) throw new Error('unreachable');
+
+    await user.click(checkboxFor(a));
+    await user.click(button('Archive'));
+    // The archive takes 2.5-4 s; the user leaves before it answers.
+    setMockConfig({ scenario: 'slow' });
+    await user.click(within(dialog()).getByRole('button', { name: 'Archive' }));
+    expect(
+      within(dialog()).getByRole('button', { name: 'Archiving…' }),
+    ).toBeInTheDocument();
+    // A page without queries, so nothing else waits on the slow scenario.
+    await router.navigate(ROUTES.audit);
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Audit log' }),
+    ).toBeInTheDocument();
+
+    expect(
+      await within(notifications()).findByText(
+        '1 product archived',
+        {},
+        { timeout: 6000 },
+      ),
+    ).toBeVisible();
+    expect(getDb().productById.get(a.id)?.archivedAt).not.toBeNull();
+  }, 10_000);
 });
 
 describe('Export CSV', () => {

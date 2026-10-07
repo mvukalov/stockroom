@@ -14,7 +14,10 @@ import {
   OrderHeaderStatus,
   type OrderDetailViewProps,
 } from './orderDetail/OrderDetailView';
-import { cancelDenialReason } from './orderDetail/orderDetailText';
+import {
+  cancelDenialReason,
+  cancelRoleReason,
+} from './orderDetail/orderDetailText';
 import { useCancelOrderDialog } from './orderDetail/useCancelOrderDialog';
 import { backToOrdersPath } from './orders/orderLinkState';
 
@@ -91,6 +94,7 @@ export function OrderDetailPage() {
           open={cancel.open}
           order={order}
           pending={cancel.pending}
+          roleReason={cancelRoleReason(currentUser)}
           error={cancel.error}
           onConfirm={() => cancel.confirm(order)}
           onDismiss={cancel.dismiss}

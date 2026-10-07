@@ -38,6 +38,19 @@ export function can(user: Pick<User, 'role'>, action: Action): boolean {
   return PERMISSIONS[action].includes(user.role);
 }
 
+/** Actions that only read: they change no data. */
+const READ_ACTIONS: ReadonlySet<Action> = new Set(['view', 'export']);
+
+/**
+ * True when the user may only read: no action that changes data is allowed. Derived
+ * from `PERMISSIONS`, so it follows any change there; it is not a permission itself.
+ */
+export function isReadOnly(user: Pick<User, 'role'>): boolean {
+  return ACTIONS.every(
+    (action) => READ_ACTIONS.has(action) || !can(user, action),
+  );
+}
+
 /** Explanation for a disabled control, or `null` when the action is allowed. */
 export function denialReason(
   user: Pick<User, 'role'>,

@@ -18,6 +18,11 @@ export type UpdateCategoryDialogProps = {
   categoryId: string;
   onCategoryChange: (categoryId: string) => void;
   pending: boolean;
+  /**
+   * Why the acting user may not do this, or `undefined`. Checked again while the
+   * dialog is open, so a user who lost the permission cannot submit.
+   */
+  roleReason: string | undefined;
   /** The last attempt failed with this message; the primary action becomes Retry. */
   error: string | undefined;
   onSubmit: () => void;
@@ -33,6 +38,7 @@ export function UpdateCategoryDialog({
   categoryId,
   onCategoryChange,
   pending,
+  roleReason,
   error,
   onSubmit,
   onDismiss,
@@ -45,6 +51,7 @@ export function UpdateCategoryDialog({
 
   let primaryReason: string | undefined;
   if (pending) primaryReason = SAVING_REASON;
+  else if (roleReason !== undefined) primaryReason = roleReason;
   else if (categoryId === '') primaryReason = 'Choose a category first';
 
   let primaryLabel = 'Update category';

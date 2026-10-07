@@ -14,6 +14,7 @@ function renderDialog(overrides: Partial<CancelOrderDialogProps> = {}) {
     open: true,
     order: orderDetail('CONFIRMED'),
     pending: false,
+    roleReason: undefined,
     error: undefined,
     onConfirm: vi.fn(),
     onDismiss: vi.fn(),
