@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
+import { READ_ONLY_REASON } from '@stockroom/domain';
+
 import { ArchiveDialog } from './ArchiveDialog';
 import { BULK_SAVE_ERROR } from './bulkActions';
 
@@ -11,6 +13,7 @@ const meta = {
     open: true,
     count: 3,
     pending: false,
+    roleReason: undefined,
     error: undefined,
     onConfirm: fn(),
     onDismiss: fn(),
@@ -23,6 +26,9 @@ type Story = StoryObj<typeof meta>;
 
 /** Cancel has the initial focus; Archive is never the default. */
 export const Default: Story = {};
+
+/** The role lost the permission while the dialog was open: Archive is disabled with the reason. */
+export const ReadOnlyRole: Story = { args: { roleReason: READ_ONLY_REASON } };
 
 export const OneProduct: Story = { args: { count: 1 } };
 

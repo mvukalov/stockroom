@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
+import { READ_ONLY_REASON } from '@stockroom/domain';
+
 import { CancelOrderDialog } from './CancelOrderDialog';
 import { orderDetail } from './orderDetailFixtures';
 import { CANCEL_ORDER_ERROR } from './orderDetailText';
@@ -12,6 +14,7 @@ const meta = {
     open: true,
     order: orderDetail('CONFIRMED'),
     pending: false,
+    roleReason: undefined,
     error: undefined,
     onConfirm: fn(),
     onDismiss: fn(),
@@ -24,6 +27,9 @@ type Story = StoryObj<typeof meta>;
 
 /** Keep order has the initial focus; Cancel order is never the default. Reserved stock is released. */
 export const Default: Story = {};
+
+/** The role lost the permission while the dialog was open: Cancel order is disabled with the reason. */
+export const ReadOnlyRole: Story = { args: { roleReason: READ_ONLY_REASON } };
 
 /** A draft reserves nothing, so the dialog does not mention stock. */
 export const Draft: Story = { args: { order: orderDetail('DRAFT') } };

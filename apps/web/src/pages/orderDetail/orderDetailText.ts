@@ -17,6 +17,14 @@ export const CANCELLING_REASON = 'The order is being cancelled';
 /** Why Cancel order is disabled before the acting user is known. */
 export const NO_USER_REASON = 'Choose a user first';
 
+/** Why the current user's role cannot cancel orders, or `undefined` when it can. */
+export function cancelRoleReason(
+  user: Pick<User, 'role'> | undefined,
+): string | undefined {
+  if (user === undefined) return NO_USER_REASON;
+  return denialReason(user, 'order.cancel') ?? undefined;
+}
+
 /**
  * Why the current user cannot cancel this order, or `undefined` when they can. The
  * role comes first (a VIEWER is told the role is read-only whatever the status),
@@ -26,9 +34,8 @@ export function cancelDenialReason(
   user: Pick<User, 'role'> | undefined,
   status: OrderStatus,
 ): string | undefined {
-  if (user === undefined) return NO_USER_REASON;
-  const roleReason = denialReason(user, 'order.cancel');
-  if (roleReason !== null) return roleReason;
+  const roleReason = cancelRoleReason(user);
+  if (roleReason !== undefined) return roleReason;
   if (canTransition(status, 'CANCELLED')) return undefined;
   return status === 'CANCELLED'
     ? 'This order is already cancelled'

@@ -12,6 +12,11 @@ export type CancelOrderDialogProps = {
   open: boolean;
   order: Pick<OrderDetail, 'number' | 'status' | 'customer'>;
   pending: boolean;
+  /**
+   * Why the acting user may not do this, or `undefined`. Checked again while the
+   * dialog is open, so a user who lost the permission cannot submit.
+   */
+  roleReason: string | undefined;
   /** The last attempt failed with this message; the primary action becomes Retry. */
   error: string | undefined;
   onConfirm: () => void;
@@ -27,6 +32,7 @@ export function CancelOrderDialog({
   open,
   order,
   pending,
+  roleReason,
   error,
   onConfirm,
   onDismiss,
@@ -68,7 +74,7 @@ export function CancelOrderDialog({
           <Button
             variant="destructive"
             onClick={onConfirm}
-            disabledReason={pending ? CANCELLING_REASON : undefined}
+            disabledReason={pending ? CANCELLING_REASON : roleReason}
           >
             {primaryLabel}
           </Button>

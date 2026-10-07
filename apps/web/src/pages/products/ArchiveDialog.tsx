@@ -10,6 +10,11 @@ export type ArchiveDialogProps = {
   /** How many products will be archived. */
   count: number;
   pending: boolean;
+  /**
+   * Why the acting user may not do this, or `undefined`. Checked again while the
+   * dialog is open, so a user who lost the permission cannot submit.
+   */
+  roleReason: string | undefined;
   /** The last attempt failed with this message; the primary action becomes Retry. */
   error: string | undefined;
   onConfirm: () => void;
@@ -25,6 +30,7 @@ export function ArchiveDialog({
   open,
   count,
   pending,
+  roleReason,
   error,
   onConfirm,
   onDismiss,
@@ -66,7 +72,7 @@ export function ArchiveDialog({
           <Button
             variant="destructive"
             onClick={onConfirm}
-            disabledReason={pending ? SAVING_REASON : undefined}
+            disabledReason={pending ? SAVING_REASON : roleReason}
           >
             {primaryLabel}
           </Button>
