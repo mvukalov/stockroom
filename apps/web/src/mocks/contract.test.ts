@@ -969,6 +969,136 @@ describe('order transitions', () => {
   });
 });
 
+describe('order detail and cancel', () => {
+  const cancel = (id: Id, as: Role = 'ADMIN') =>
+    call(`/api/orders/${id}/transition`, {
+      method: 'POST',
+      as,
+      body: { to: 'CANCELLED' },
+    });
+
+  /** The product as `GET /api/products` lists it. */
+  async function listedProduct(sku: string) {
+    const page = ENDPOINTS.listProducts.response.parse(
+      (await call(`/api/products?search=${encodeURIComponent(sku)}`)).body,
+    );
+    const item = page.items.find((p) => p.sku === sku);
+    if (!item) throw new Error(`Product ${sku} is not listed`);
+    return item;
+  }
+
+  async function openOrders(): Promise<number> {
+    return ENDPOINTS.getDashboard.response.parse(
+      (await call('/api/dashboard')).body,
+    ).openOrders.value;
+  }
+
+  it('returns an existing order with its lines and totals', async () => {
+    const order = orderWith('CONFIRMED');
+    const detail = ENDPOINTS.getOrder.response.parse(
+      (await call(`/api/orders/${order.id}`, { as: 'VIEWER' })).body,
+    );
+    expect(detail.number).toBe(order.number);
+    expect(detail.lines.map((l) => l.id)).toEqual(order.lines.map((l) => l.id));
+    expect(detail.totalCents).toBe(detail.subtotalCents + detail.vatCents);
+  });
+
+  it('returns NOT_FOUND for an unknown or malformed id', async () => {
+    expectError(await call(`/api/orders/${newId()}`), 404, 'NOT_FOUND');
+    expectError(await call('/api/orders/not-an-id'), 404, 'NOT_FOUND');
+  });
+
+  it.each(['ADMIN', 'CLERK'] as const)(
+    'lets %s cancel and records one status change',
+    async (role) => {
+      const order = orderWith('CONFIRMED');
+      const auditBefore = getDb().auditLog.length;
+
+      const result = await cancel(order.id, role);
+
+      expect(result.status).toBe(200);
+      expect(ENDPOINTS.transitionOrder.response.parse(result.body).status).toBe(
+        'CANCELLED',
+      );
+      expect(getDb().auditLog.length).toBe(auditBefore + 1);
+      expect(getDb().auditLog.at(-1)).toMatchObject({
+        type: 'ORDER_STATUS_CHANGED',
+        orderId: order.id,
+        from: 'CONFIRMED',
+        to: 'CANCELLED',
+      });
+    },
+  );
+
+  it('forbids VIEWER and changes nothing', async () => {
+    const order = orderWith('PICKED');
+    const auditBefore = getDb().auditLog.length;
+
+    expectError(await cancel(order.id, 'VIEWER'), 403, 'FORBIDDEN');
+
+    expect(getDb().orders.find((o) => o.id === order.id)?.status).toBe(
+      'PICKED',
+    );
+    expect(getDb().auditLog.length).toBe(auditBefore);
+  });
+
+  it('refuses a shipped order with a message naming the status and changes nothing', async () => {
+    const order = orderWith('SHIPPED');
+    const auditBefore = getDb().auditLog.length;
+    const movementsBefore = getDb().movements.length;
+
+    const error = expectError(
+      await cancel(order.id),
+      409,
+      'INVALID_TRANSITION',
+    );
+
+    expect(error.message).toContain('SHIPPED');
+    expect(getDb().orders.find((o) => o.id === order.id)).toEqual(order);
+    expect(getDb().auditLog.length).toBe(auditBefore);
+    expect(getDb().movements.length).toBe(movementsBefore);
+  });
+
+  it('returns an already cancelled order unchanged when the cancel is repeated', async () => {
+    const order = orderWith('DRAFT');
+    const first = await cancel(order.id);
+    const afterFirst = getDb().orders.find((o) => o.id === order.id);
+    const auditAfterFirst = getDb().auditLog.length;
+
+    const second = await cancel(order.id);
+
+    expect(second.status).toBe(200);
+    expect(second.body).toEqual(first.body);
+    expect(getDb().orders.find((o) => o.id === order.id)).toEqual(afterFirst);
+    expect(getDb().auditLog.length).toBe(auditAfterFirst);
+  });
+
+  it('shows the cancellation in the list, the open orders and the availability', async () => {
+    const order = orderWith('CONFIRMED');
+    const detail = ENDPOINTS.getOrder.response.parse(
+      (await call(`/api/orders/${order.id}`)).body,
+    );
+    const [line] = detail.lines;
+    if (!line) throw new Error('Confirmed order without lines');
+    const reservedHere = detail.lines
+      .filter((l) => l.productId === line.productId)
+      .reduce((sum, l) => sum + l.quantity, 0);
+    const productBefore = await listedProduct(line.productSku);
+    const openBefore = await openOrders();
+
+    await cancel(order.id);
+
+    const list = ENDPOINTS.listOrders.response.parse(
+      (await call(`/api/orders?search=${order.number}`)).body,
+    );
+    expect(list.items.find((o) => o.id === order.id)?.status).toBe('CANCELLED');
+    expect(await openOrders()).toBe(openBefore - 1);
+    const productAfter = await listedProduct(line.productSku);
+    expect(productAfter.reserved).toBe(productBefore.reserved - reservedHere);
+    expect(productAfter.available).toBe(productBefore.available + reservedHere);
+  });
+});
+
 describe('PATCH /api/orders/:id', () => {
   it('records an ORDER_EDITED entry with the line changes', async () => {
     const order = orderWith('DRAFT');
