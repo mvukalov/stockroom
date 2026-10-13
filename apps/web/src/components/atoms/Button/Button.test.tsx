@@ -3,6 +3,7 @@ import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from './Button';
+import { hasOpenReason } from './openReason';
 
 describe('Button', () => {
   it('is a non-submitting button by default', () => {
@@ -341,6 +342,61 @@ describe('Button', () => {
       expect(onPointerEnter).toHaveBeenCalledTimes(1);
       expect(onFocus).toHaveBeenCalledTimes(1);
       expect(onBlur).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows one reason at a time: a hovered button closes the reason of the focused one', async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <Button disabledReason="You are on the first page">Previous</Button>
+          <Button disabledReason={REASON}>Archive</Button>
+        </>,
+      );
+      const previous = screen.getByRole('button', { name: 'Previous' });
+
+      await user.tab();
+      expect(previous).toHaveFocus();
+      expect(screen.getByRole('tooltip')).toHaveTextContent(
+        'You are on the first page',
+      );
+
+      await user.hover(screen.getByRole('button', { name: 'Archive' }));
+      expect(screen.getByRole('tooltip')).toHaveTextContent(REASON);
+
+      // The focused button keeps focus and shows its reason again on Enter.
+      await user.unhover(screen.getByRole('button', { name: 'Archive' }));
+      expect(reason()).not.toBeInTheDocument();
+      expect(previous).toHaveFocus();
+      await user.keyboard('{Enter}');
+      expect(screen.getByRole('tooltip')).toHaveTextContent(
+        'You are on the first page',
+      );
+    });
+
+    it('is no longer the open reason once it closes', async () => {
+      const user = userEvent.setup();
+      render(<Button disabledReason={REASON}>Archive</Button>);
+
+      await user.tab();
+      expect(reason()).toBeVisible();
+      expect(hasOpenReason()).toBe(true);
+
+      await user.keyboard('{Escape}');
+      expect(reason()).not.toBeInTheDocument();
+      expect(hasOpenReason()).toBe(false);
+    });
+
+    it('is no longer the open reason once its button unmounts', async () => {
+      const user = userEvent.setup();
+      const { unmount } = render(
+        <Button disabledReason={REASON}>Archive</Button>,
+      );
+      await user.tab();
+      expect(hasOpenReason()).toBe(true);
+
+      unmount();
+
+      expect(hasOpenReason()).toBe(false);
     });
 
     it('is not rendered for a button without a reason', async () => {

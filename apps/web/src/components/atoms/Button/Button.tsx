@@ -11,6 +11,7 @@ import {
 
 import { cx } from '../../../utils/cx';
 import styles from './Button.module.scss';
+import { claimOpenReason } from './openReason';
 import { reasonPosition } from './reasonPosition';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
@@ -89,6 +90,14 @@ export function Button({
       window.removeEventListener('resize', place);
     };
   }, [open, disabledReason]);
+
+  // One reason at a time: opening this one closes the other (one button focused,
+  // another hovered). Before paint, so two are never on screen in the same frame.
+  // Released when it closes and when the button unmounts.
+  useLayoutEffect(() => {
+    if (!open) return;
+    return claimOpenReason(() => setTriggers(CLOSED));
+  }, [open]);
 
   // Escape hides the reason without moving focus (WCAG 1.4.13). It is taken before
   // anything else sees it, so the first Escape does not also close a dialog or menu.
