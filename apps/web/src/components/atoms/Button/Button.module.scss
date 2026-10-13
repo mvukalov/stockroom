@@ -60,3 +60,37 @@
   background-color: var(--color-danger);
   color: var(--color-text-on-accent);
 }
+
+// The reason of a blocked button, shown on hover, focus and tap. Fixed to the
+// viewport (Button sets `top` and `left`), so a scroll region or a dialog body does
+// not clip it. Above the shell's sticky parts and the toasts (z-index 1 to 3). The
+// transparent padding is the gap to the button: the box touches it, so the pointer
+// can move onto the text. Text styles are set here, not inherited from the place
+// the button sits in (a table cell, a toolbar).
+.reason {
+  position: fixed;
+  z-index: 4;
+  width: max-content;
+  max-width: min(20rem, calc(100vw - 2 * var(--space-2)));
+  padding-block: var(--space-1);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+  text-align: start;
+  white-space: normal;
+  overflow-wrap: anywhere;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+// Tested pair: --color-text-on-inverse on --color-surface-inverse.
+.reasonText {
+  display: block;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-control);
+  background-color: var(--color-surface-inverse);
+  color: var(--color-text-on-inverse);
+  box-shadow: var(--shadow-overlay);
+}

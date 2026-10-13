@@ -67,6 +67,7 @@ export const TEXT_PAIRS: Array<[string, string]> = [
   ['--color-text-on-accent', '--color-accent-hover'],
   ['--color-text-on-accent', '--color-danger'],
   ['--color-text-on-accent', '--color-danger-hover'],
+  ['--color-text-on-inverse', '--color-surface-inverse'],
   ['--color-nav-active-text', '--color-nav-active-bg'],
   ['--color-success', '--color-success-bg'],
   ['--color-warning', '--color-warning-bg'],

@@ -18,6 +18,10 @@
   --color-text-subtle: #646d7a;
   --color-text-on-accent: #ffffff;
 
+  /* Inverse: the reason shown next to a disabled control */
+  --color-surface-inverse: #111827;
+  --color-text-on-inverse: #ffffff;
+
   /* Accent and focus */
   --color-accent: #0f766e;
   --color-accent-hover: #115e59;

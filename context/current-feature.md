@@ -1,20 +1,57 @@
-# Current Feature
+# Current Feature: Visible reason for disabled controls
 
 ## Status
 
-Not Started
+In Review
 
 ## Spec file
 
-<!-- Repo-relative path of the loaded spec. Filled by /feature load, used by /feature complete. -->
+context/features/007_02-disabled-reason-spec.md
 
 ## Goals
 
-<!-- Goals of the loaded feature as checkable bullets. Filled by /feature load. -->
+### Inventory (first, as the plan's evidence)
+
+- [x] List how `Button` renders `disabledReason` today (attributes, element, how the reason reaches assistive technology, whether a disabled button can take focus) and every use of `disabledReason` with its text; say whether a tooltip or popover component exists
+- [x] State the chosen approach and why: whether the pattern moves to `aria-disabled` with click and Enter/Space blocked, and what that changes for existing tests
+
+### Behaviour
+
+- [x] A disabled control with a reason shows it as visible text on pointer hover, keyboard focus and tap on touch; the control takes keyboard focus while disabled
+- [x] WCAG 1.4.13: dismissible with Escape without moving focus, hoverable, persistent until hover/focus leaves or it is dismissed
+- [x] Reason linked with `aria-describedby`, control keeps its accessible name, visible and described text are the same string; no `title`-only reasons
+- [x] A disabled control never fires its action: click, Enter and Space do nothing and send no request
+- [x] Looks right at 375 and 1280 px: no viewport overflow, not clipped by the table scroll region or the dialog, does not cover its control; contrast meets the project rule
+- [x] Applies to every `disabledReason` through the shared component, no per-page copies; where a dialog already shows `roleReason` inline, keep it and do not show the same sentence twice
+
+### Tests, stories, gate
+
+- [x] Stories: disabled with reason (hover and focus), long reason, at the viewport edge, inside a dialog, inside a scroll region; a11y addon reports no violations
+- [x] RTL + user-event: appears on hover and focus, disappears on Escape and blur, stays while the pointer is over it, `aria-describedby`; click/Enter/Space do nothing; a control with no reason is unchanged
+- [x] Role matrix and role switch tests pass, adjusted only where the disabled mechanism changed; the plan lists each adjustment
+- [x] axe at 375 and 1280 px on Products, Movements and Order detail for VIEWER with a reason visible
+- [x] `pnpm lint`, `typecheck`, `test`, `build` and `build-storybook` green
 
 ## Notes
 
-<!-- Constraints, ADRs, does-not-include items, spec path. Filled by /feature load. -->
+- Feature 007, part 2; fixes Role pass finding G4 (sighted VIEWER sees no reason). Depends on `007_01` (merged, PR #35), `002_*` (`Button` with `disabledReason`), ADR-0004, `design-direction.md` sections 5 and 9.
+- Decisions: one shared pattern in `Button` (plus one small reason component if needed), never in pages; disabled controls stay visible (ADR-0004); reason text unchanged, from `denialReason` or the status rule; no new libraries (if positioning needs more than CSS, ask first).
+- Does not include: new permissions, reason wording changes, role switcher changes, a general tooltip system for enabled controls, E2E tests.
+- Do not remove the existing accessible description until the visible one is proven by tests.
+- Manual keyboard-only pass as VIEWER on Products, Movements and Order detail.
+- Must keep passing: `apps/web/src/pages/roleMatrix.test.tsx`, `roleSwitch.test.tsx`.
+- ADR check: no contradiction with ADR-0004 (controls stay visible).
+- Open: the spec says "contrast in both themes", but only a light theme exists (`design-direction.md`: dark theme is a later item). Read as light theme only unless Martin says otherwise.
+- 19 files in `apps/web/src` reference `disabledReason` (inventory in the plan).
+- Implementation: `Button` already used `aria-disabled` with blocked activation, so the mechanism is unchanged and the role matrix and role switch tests needed no adjustment. The `VisuallyHidden` reason became a `role="tooltip"` span that is `hidden` while closed (still the `aria-describedby` target), `position: fixed` placed by the pure `reasonPosition` (below, else above, clamped to an 8 px edge). New tokens `--color-surface-inverse` / `--color-text-on-inverse` with a tested contrast pair.
+- Decision (pending states): the reason opens only on a new hover, focus or tap while the control is blocked, for every reason alike. A control that becomes blocked under existing focus or hover (Saving…) shows nothing until the user moves to it again. APG tooltip: shown in response to hover or focus of its owner; a state change is neither, and the visible label ("Saving…") already reports it. Tested.
+- Escape is taken at document capture while a reason is open (`preventDefault` + `stopPropagation`). Chromium: the first Escape closes only the reason in the Update category dialog and the row menu, the second closes them.
+- Fixed-positioning ancestors (runtime scan in Chromium): none for Products, Movements, Order detail, the New movement drawer (no slide animation exists), the dialogs and the row menu. Exception: a toast has `transform` during its 160 ms enter animation (`fill: none`), so a reason opened on Undo within those 160 ms is offset until the animation ends. Reported, not worked around.
+- `NewMovement.test.tsx` "sends one request however often Save is pressed" failed once in a full run (drawer already closed before reading Saving…, 200 ms mock latency under load) and passed in isolation 3/3 and in the next full run. Timing flake, not caused by the reason.
+- Tap: a click opens the reason as a tap only for `touch` and `pen` (pointer type of the last `pointerdown` on the button). A mouse shows it by hover; Enter or Space on the focused button (`detail === 0`) reopens it through the focus trigger. Fixes review finding 2 (Safari keeps a clicked button unfocused, so a mouse click left the reason open after the pointer left).
+- Known limitation (review finding 1): each `Button` keeps its own reason state, so two reasons can be open at once (one blocked button focused, another hovered). Escape closes both. A single shared tooltip state would fix it; left out as more than a minimal change.
+- E2E candidate (review finding 3): the first Escape in a native `<dialog>` closing only the reason, the second closing the dialog, is verified manually in Chromium only; jsdom does not model the dialog close request. Cover it in the E2E feature (Update category dialog as ADMIN, row menu as VIEWER).
+- Not changed (review finding 4): the stories were checked with axe-core 4.13 injected into the Storybook iframe (the engine the a11y addon runs), 0 violations at 375 and 1280 px, not through the addon panel itself. A pass in the a11y panel is a manual step. Mention this in the PR notes.
 
 ## History
 
