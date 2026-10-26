@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 
 import { IconButton } from '../../atoms/IconButton/IconButton';
 import { Brand } from '../../molecules/Brand/Brand';
+import { DemoNote } from '../../molecules/DemoNote/DemoNote';
 import { NavList } from '../../molecules/NavList/NavList';
 import styles from './NavDrawer.module.scss';
 
@@ -67,6 +68,7 @@ export function NavDrawer({ open, onDismiss, onNavigate, id }: NavDrawerProps) {
             <NavList onNavigate={onNavigate} />
           </nav>
         )}
+        <DemoNote />
       </div>
     </dialog>
   );

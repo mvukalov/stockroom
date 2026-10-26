@@ -1,0 +1,7 @@
+// Bottom of the sidebar and the navigation drawer.
+.note {
+  padding: var(--space-3);
+  border-top: var(--border-width) solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}

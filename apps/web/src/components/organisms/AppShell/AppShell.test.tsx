@@ -20,6 +20,7 @@ const NAV_LABELS = [
 const h1 = (name: string) => screen.findByRole('heading', { level: 1, name });
 const sidebarNav = () =>
   screen.getAllByRole('navigation', { name: 'Main' })[0]!;
+const DEMO_NOTE = 'Demo: mock data in your browser, resets on reload.';
 
 describe('AppShell layout', () => {
   it('has a skip link, a main nav, a banner and one main', async () => {
@@ -59,6 +60,15 @@ describe('Sidebar', () => {
     expect(
       within(sidebarNav()).getByRole('link', { name: 'Orders' }),
     ).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('says the data is mock data, except in the collapsed rail', async () => {
+    const { user } = renderApp(ROUTES.dashboard);
+    await h1('Dashboard');
+
+    expect(within(sidebarNav()).getByText(DEMO_NOTE)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Sidebar' }));
+    expect(within(sidebarNav()).queryByText(DEMO_NOTE)).not.toBeInTheDocument();
   });
 
   it('collapses to a rail that keeps link names, and remembers it', async () => {
@@ -147,6 +157,7 @@ describe('mobile navigation drawer', () => {
       within(dialog).getByRole('navigation', { name: 'Main' }),
     ).toBeInTheDocument();
     expect(dialog).toContainElement(document.activeElement as HTMLElement);
+    expect(within(dialog).getByText(DEMO_NOTE)).toBeInTheDocument();
   });
 
   it('closes on Escape and returns focus to the menu button', async () => {

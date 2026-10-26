@@ -11,7 +11,7 @@ import { recordApiRequests, requestsSettled } from './support/requests';
 
 const GUARDED = ['Update category', 'Create adjustment', 'Archive'] as const;
 
-test('switching ADMIN to VIEWER and back on Products keeps the selection and refetches nothing', async ({
+test('switching ADMIN to VIEWER and back on Products keeps the selection and refetches nothing @smoke', async ({
   page,
 }) => {
   await page.goto(ROUTES.products);

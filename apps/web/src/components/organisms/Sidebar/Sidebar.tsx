@@ -4,6 +4,7 @@ import { useId } from 'react';
 import { cx } from '../../../utils/cx';
 import { IconButton } from '../../atoms/IconButton/IconButton';
 import { Brand } from '../../molecules/Brand/Brand';
+import { DemoNote } from '../../molecules/DemoNote/DemoNote';
 import { NavList } from '../../molecules/NavList/NavList';
 import styles from './Sidebar.module.scss';
 
@@ -37,6 +38,8 @@ export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
       <div className={styles.links}>
         <NavList collapsed={collapsed} />
       </div>
+      {/* The rail has no room for it; the "Demo user" switcher stays in view. */}
+      {!collapsed && <DemoNote />}
     </nav>
   );
 }
