@@ -125,7 +125,9 @@ const LISTS = [
 test.describe('axe', { tag: '@mobile' }, () => {
   for (const screen of SCREENS) {
     for (const role of screen.guarded ? ROLE_LABELS : (['Admin'] as const)) {
-      test(`${screen.name} as ${role}`, async ({ page }) => {
+      // One scan per route is part of the smoke check against a deployed site.
+      const tag = role === 'Admin' ? ['@smoke'] : [];
+      test(`${screen.name} as ${role}`, { tag }, async ({ page }) => {
         await screen.open(page, role);
         await expectNoAxeViolations(page);
       });

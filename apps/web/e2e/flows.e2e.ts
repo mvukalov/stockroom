@@ -82,7 +82,7 @@ test.describe('core flows', () => {
     }
   });
 
-  test('CLERK creates a movement and undoes it from the toast', async ({
+  test('CLERK creates a movement and undoes it from the toast @smoke', async ({
     page,
   }) => {
     await openAs(page, 'Clerk', ROUTES.movements);
