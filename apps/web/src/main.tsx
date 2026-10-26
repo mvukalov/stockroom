@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App.tsx';
+import { StartupErrorPage } from './pages/StartupErrorPage.tsx';
 import './styles/index.css';
 
 // Development and the static demo run on the MSW mock. A real-API build sets
@@ -11,10 +12,24 @@ async function enableMocking(): Promise<void> {
   await startMockWorker();
 }
 
-void enableMocking().then(() => {
-  createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-      <App />
-    </StrictMode>,
-  );
-});
+const root = createRoot(document.getElementById('root')!);
+
+// The app renders only once the worker is ready, so no request bypasses the mock.
+// Without it nothing could load, so the visitor gets the reason instead of the app.
+void enableMocking().then(
+  () => {
+    root.render(
+      <StrictMode>
+        <App />
+      </StrictMode>,
+    );
+  },
+  (error: unknown) => {
+    console.error('The mock API did not start.', error);
+    root.render(
+      <StrictMode>
+        <StartupErrorPage />
+      </StrictMode>,
+    );
+  },
+);
