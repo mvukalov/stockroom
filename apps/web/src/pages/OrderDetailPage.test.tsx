@@ -16,7 +16,7 @@ import { orderPath, ROUTES } from '../app/routes';
 import { setMockConfig } from '../mocks/config';
 import { getDb } from '../mocks/db';
 import { toOrderDetail } from '../mocks/readModels';
-import { seedUser, setupMockServer } from '../test/mockServer';
+import { holdResponses, seedUser, setupMockServer } from '../test/mockServer';
 import { renderApp } from '../test/renderApp';
 import { formatCents } from '../utils/formatCents';
 import {
@@ -348,7 +348,8 @@ describe('cancelling', () => {
     const order = orderWith('DRAFT');
     const { user } = await renderOrder(order);
     const requests = recordOrderRequests();
-    setMockConfig({ latency: { minMs: 300, maxMs: 300 } });
+    // Held until the checks below are done, so the dialog cannot close under them.
+    const held = holdResponses('transitionOrder');
 
     await cancelThroughDialog(user);
     const pending = inDialog().getByRole('button', { name: 'Cancelling…' });
@@ -357,10 +358,10 @@ describe('cancelling', () => {
     await user.click(pending);
     await user.keyboard('{Escape}');
     expect(dialog()).toBeInTheDocument();
+    await waitFor(() => expect(cancelRequests(requests)).toHaveLength(1));
 
-    await waitFor(() => expect(queryDialog()).not.toBeInTheDocument(), {
-      timeout: 3000,
-    });
+    held.release();
+    await waitFor(() => expect(queryDialog()).not.toBeInTheDocument());
     expect(cancelRequests(requests)).toHaveLength(1);
   });
 

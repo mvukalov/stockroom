@@ -22,7 +22,7 @@ import { UNDO_FAILED_OFFLINE } from '../app/toasts/undoText';
 import { setMockConfig } from '../mocks/config';
 import { getDb } from '../mocks/db';
 import { availabilityOf } from '../mocks/readModels';
-import { seedUser, setupMockServer } from '../test/mockServer';
+import { holdResponses, seedUser, setupMockServer } from '../test/mockServer';
 import { renderApp } from '../test/renderApp';
 import { scrollTo, stubScrollContainerSize } from '../test/scrollContainerSize';
 import { shortId } from '../utils/shortId';
@@ -261,7 +261,8 @@ describe('New movement drawer', () => {
       quantity: 14,
     });
 
-    setMockConfig({ latency: { minMs: 200, maxMs: 200 } });
+    // Held until the saving row is checked, so it cannot be stored under the checks.
+    const held = holdResponses('createMovement');
     await save(user);
 
     // Saving: inserted at once, marked with text, no Copy ID.
@@ -277,6 +278,7 @@ describe('New movement drawer', () => {
     expect(table()).toHaveAttribute('aria-rowcount', String(before + 2));
 
     // Stored: the same row, with its time and Copy ID.
+    held.release();
     await waitFor(() =>
       expect(within(first()).queryByText('Saving…')).not.toBeInTheDocument(),
     );
@@ -293,7 +295,6 @@ describe('New movement drawer', () => {
       ),
     ).toBeInTheDocument();
 
-    setMockConfig({ latency: { minMs: 0, maxMs: 0 } });
     await act(() => router.navigate(`/products?search=${product.sku}`));
     const productsTable = await screen.findByRole('table', {
       name: 'Products',
@@ -362,6 +363,7 @@ describe('New movement drawer', () => {
   it('sends one request however often Save is pressed while it is saving', async () => {
     const creates = recordCreates();
     const { product, locationId } = stockedProduct();
+    const before = getDb().movements.length;
     const { user } = await renderMovements();
     await fillDrawer(user, {
       type: 'RECEIPT',
@@ -369,7 +371,8 @@ describe('New movement drawer', () => {
       locationId,
       quantity: 2,
     });
-    setMockConfig({ latency: { minMs: 200, maxMs: 200 } });
+    // Held until the checks below are done, so the drawer cannot close under them.
+    const held = holdResponses('createMovement');
 
     await save(user);
     const saving = inDrawer().getByRole('button', { name: 'Saving…' });
@@ -377,9 +380,13 @@ describe('New movement drawer', () => {
     await user.click(saving);
     await user.keyboard('{Escape}');
     expect(drawer()).toBeInTheDocument();
+    await waitFor(() => expect(creates).toHaveLength(1));
+    expect(getDb().movements).toHaveLength(before);
 
+    held.release();
     await waitFor(() => expect(queryDrawer()).not.toBeInTheDocument());
     expect(creates).toHaveLength(1);
+    expect(getDb().movements).toHaveLength(before + 1);
   });
 
   it('shows a refusal for lack of stock at the Quantity field and changes nothing', async () => {
