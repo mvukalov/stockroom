@@ -41,6 +41,7 @@ Language: English only (UI, content, code, docs, commits).
 | Fake data | `@faker-js/faker` with a fixed seed | |
 | Tests | Vitest, React Testing Library, Playwright + axe, contract tests | |
 | CI/CD | GitHub Actions, Lighthouse CI, Docker | |
+| Static demo hosting (phase 1) | Vercel, Git integration | `docs/deploy.md` |
 
 Not used: Next.js (summit-drift covers it), Tailwind, Angular/Vue.
 

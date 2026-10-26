@@ -36,6 +36,26 @@ Every run writes an HTML report to `apps/web/playwright-report/`, passed or fail
 
 If a preview is already running on port 4173, the suite reuses it instead of building. Stop it after changing the app, or the suite tests the old build.
 
+### Against a deployed site
+
+`E2E_BASE_URL` points the suite at a deployed site. Nothing is built or served locally then. Only the smoke subset (tests tagged `@smoke`) is meant for that; the full suite stays local.
+
+```
+E2E_BASE_URL=https://<deployment-url> pnpm e2e --grep @smoke
+```
+
+The smoke subset:
+
+- every route by direct URL and reload, with filters in the query string, an order detail and `?mock=empty`
+- the mock service worker in control of the page
+- `/robots.txt` served as text, not as the app
+- the host's cache headers, and a 404 for a missing asset (this test is skipped without `E2E_BASE_URL`, since `vite preview` sends no such headers)
+- axe on every route at 1280 and 375 px
+- one role switch
+- one mutation (create a movement and undo it)
+
+It runs against the local preview too (`pnpm e2e --grep @smoke`). How deploys work: [Deploying the demo](deploy.md).
+
 ### What the suite covers
 
 Only what a real browser is needed for; logic stays in the Vitest tests.
@@ -46,10 +66,12 @@ Only what a real browser is needed for; logic stays in the Vitest tests.
 - **Roles:** switching ADMIN to VIEWER and back on Products without a refetch; the three mutations as the role that may do them (archive, create a movement and undo it, cancel an order); the same three refused for a VIEWER with no mutating request sent.
 - **Virtualized lists** (Movements, Audit log): a window of rows, the next page loaded once, focus kept while scrolling, the slow and error mock scenarios.
 - **Keyboard:** skip link, sidebar, role switcher and a page's main action, with a visible focus ring at each stop.
+- **Deploy:** deep links and reloads with query strings, the worker in control, `/robots.txt` as text, cache headers against a deployed site, and the startup error when service workers are blocked or the mock's code fails to load.
 
 ### How the tests are written
 
 - Two projects: `desktop` (1280 px) runs everything, `mobile` (375 px) runs the tests tagged `@mobile`, where the layout matters.
+- `@smoke` marks the subset that also runs against a deployed site.
 - Every test starts in a new browser context: the mock store lives in the page, so each test gets fresh seed data and the default ADMIN user. Other roles are picked in the role switcher.
 - Locators are roles, labels and text. No CSS selectors and no test ids.
 - No fixed waits. "Nothing was sent" is asserted by sending a marker request and checking what was recorded before it (`e2e/support/requests.ts`).
