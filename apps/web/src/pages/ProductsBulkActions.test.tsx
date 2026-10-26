@@ -10,7 +10,7 @@ import { setMockConfig } from '../mocks/config';
 import { getDb } from '../mocks/db';
 import { archiveConflictMessage } from '../mocks/handlers/catalog';
 import { availabilityOf } from '../mocks/readModels';
-import { seedUser, setupMockServer } from '../test/mockServer';
+import { holdResponses, seedUser, setupMockServer } from '../test/mockServer';
 import { renderApp } from '../test/renderApp';
 import { BULK_SAVE_ERROR, SAVING_REASON } from './products/bulkActions';
 
@@ -229,7 +229,8 @@ describe('Update category, edge cases', () => {
     if (!a) throw new Error('unreachable');
     const category = otherCategory(a);
     const requests = recordBulkRequests();
-    setMockConfig({ latency: { minMs: 300, maxMs: 300 } });
+    // Held until the checks below are done, so the dialog cannot close under them.
+    const held = holdResponses('bulkProducts');
 
     await user.click(checkboxFor(a));
     await user.click(button('Update category'));
@@ -249,10 +250,10 @@ describe('Update category, edge cases', () => {
     await user.click(pending);
     await user.keyboard('{Escape}');
     expect(dialog()).toBeInTheDocument();
+    await waitFor(() => expect(requests).toHaveLength(1));
 
-    await waitFor(() => expect(queryDialog()).not.toBeInTheDocument(), {
-      timeout: 3000,
-    });
+    held.release();
+    await waitFor(() => expect(queryDialog()).not.toBeInTheDocument());
     expect(requests).toHaveLength(1);
   });
 });
@@ -338,7 +339,8 @@ describe('Archive', () => {
     const [a] = archivableOnFirstPage(1);
     if (!a) throw new Error('unreachable');
     const requests = recordBulkRequests();
-    setMockConfig({ latency: { minMs: 300, maxMs: 300 } });
+    // Held until the checks below are done, so the dialog cannot close under them.
+    const held = holdResponses('bulkProducts');
 
     await user.click(checkboxFor(a));
     await user.click(button('Archive'));
@@ -353,10 +355,10 @@ describe('Archive', () => {
     await user.click(pending);
     await user.keyboard('{Escape}');
     expect(dialog()).toBeInTheDocument();
+    await waitFor(() => expect(requests).toHaveLength(1));
 
-    await waitFor(() => expect(queryDialog()).not.toBeInTheDocument(), {
-      timeout: 3000,
-    });
+    held.release();
+    await waitFor(() => expect(queryDialog()).not.toBeInTheDocument());
     expect(requests).toHaveLength(1);
   });
 });
