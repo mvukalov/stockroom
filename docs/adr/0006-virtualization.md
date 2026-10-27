@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-06
+- Editorial revision 2026-10-27: removed references to job-market research; the decision is unchanged.
 
 ## Context
 
@@ -19,7 +20,7 @@ What the list needs:
 - A focused element inside a row (a button, a link) must not disappear when it scrolls out of the rendered window.
 - It works with TanStack Query (ADR-0002) and does not expose its types in our public API.
 
-Facts checked on 2026-10-06 in the npm registry: `@tanstack/react-virtual` 3.14.13 (MIT, peers `react` 16.8 to 19), `react-virtuoso` 4.18.12 (MIT, peers `react` 16 to 19), `react-window` 2.3.3 (MIT, peers `react` 18 and 19). Statements about features below come from each library's own documentation as read on that date; the plan must confirm the exact API in the official docs before writing code. No job-ad review was done for this decision, so there is no market evidence either way; add it here if Martin collects some.
+Facts checked on 2026-10-06 in the npm registry: `@tanstack/react-virtual` 3.14.13 (MIT, peers `react` 16.8 to 19), `react-virtuoso` 4.18.12 (MIT, peers `react` 16 to 19), `react-window` 2.3.3 (MIT, peers `react` 18 and 19). Statements about features below come from each library's own documentation as read on that date; the plan must confirm the exact API in the official docs before writing code.
 
 ## Options: loading strategy
 

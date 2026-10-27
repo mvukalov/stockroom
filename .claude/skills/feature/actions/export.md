@@ -1,6 +1,6 @@
 # Export Action
 
-Write a private learning document for the current feature: what was built, why, how it was verified, and how to explain it in a job interview. The document is for the developer's own learning. It is **never committed**.
+Write a private learning document for the current feature: what was built, why, how it was verified, and how to explain it in review. The document is for the developer's own learning. It is **never committed**.
 
 ## When
 
@@ -25,8 +25,8 @@ Write a private learning document for the current feature: what was built, why, 
    - research docs linked from the spec or notes (`docs/*.md`)
 2. Fill `../templates/learning-doc.md` section by section. Every section is required; if one truly doesn't apply, write one line saying why.
 3. **Files section:** list **every** file from `git diff --stat main...HEAD`, grouped (added / modified / deleted), each with one sentence on why it was added or changed. Don't skip config, docs or generated files. Group generated files into one line (e.g. `pnpm-lock.yaml`: generated, never edited by hand).
-4. **Code examples:** include the key snippets (not whole files). Choose what a reviewer or interviewer would ask about: the central logic, a non-obvious decision, a test that proves behaviour. Explain important lines right below each snippet.
-5. **Interview questions:** 8–12 realistic questions with short, first-person answers grounded in what this feature actually did. End with one common trap (a thing that sounds right but is wrong).
+4. **Code examples:** include the key snippets (not whole files). Choose what a reviewer would ask about: the central logic, a non-obvious decision, a test that proves behaviour. Explain important lines right below each snippet.
+5. **Review questions:** 8–12 realistic questions with short, first-person answers grounded in what this feature actually did. End with one common trap (a thing that sounds right but is wrong).
 6. Write for someone who has never used the technology: define every term the first time it appears (the glossary section helps).
 7. Show the user the file path and a short outline when done. Do **not** `git add` the file.
 

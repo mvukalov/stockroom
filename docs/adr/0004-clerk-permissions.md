@@ -2,12 +2,13 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-04
+- Editorial revision 2026-10-27: corrected the signature of `can` to match the code; the decision is unchanged.
 
 ## Context
 
 The prototype review left one permission question open. `CLERK` can create movements, create and edit orders and move them through the status flow. It is undecided whether a `CLERK` may also cancel orders and archive products. Cancelling is irreversible and, for `CONFIRMED` and `PICKED` orders, releases reserved stock (ADR-0003). Archiving removes a product from use but keeps its history.
 
-The permission function is `can(user, action, resource) -> boolean`, shared by UI guards and, in phase 2, the API.
+The permission function is `can(user, action) => boolean`, shared by UI guards and, in phase 2, the API.
 
 ## Options
 

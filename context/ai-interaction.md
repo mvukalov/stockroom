@@ -4,7 +4,7 @@ Developer = architect, Claude = executor. Martin decides what is built and why; 
 
 ## Roles
 
-- **Martin:** decisions, requirements, architecture, approval of every change, commit, push and merge. Must be able to explain every decision in an interview, so reads every PR.
+- **Martin:** decisions, requirements, architecture, approval of every change, commit, push and merge. Every decision must be explainable, so Martin reads every PR.
 - **Claude Code:** research, implementation, tests, build, lint, git (see Git rules below), review.
 - **Claude in chat:** advice, specs, reviews, UI/UX feedback. Does not write to the repo.
 
