@@ -17,6 +17,7 @@ import type {
 
 import { Button } from '../../components/atoms/Button/Button';
 import { Icon } from '../../components/atoms/Icon/Icon';
+import { PageCount } from '../../components/molecules/PageCount/PageCount';
 import type { ColumnDef } from '../../components/organisms/DataTable/columns';
 import { DataTable } from '../../components/organisms/DataTable/DataTable';
 import { RowActionsMenu } from '../../components/organisms/DataTable/RowActionsMenu';
@@ -41,16 +42,18 @@ export const PRODUCTS_DESCRIPTION =
 
 const PRODUCT_NOUN: ItemNoun = { one: 'product', other: 'products' };
 
-/** Under the page title: the description, then the count once data has arrived. */
+/** Under the page title: the description, then the count (its line kept while loading). */
 export function ProductsSummary({ total }: { total: number | undefined }) {
   return (
     <>
       <p>{PRODUCTS_DESCRIPTION}</p>
-      {total !== undefined && (
-        <p className={styles.count}>
-          {formatCount(total)} {total === 1 ? 'product' : 'products'}
-        </p>
-      )}
+      <PageCount
+        text={
+          total === undefined
+            ? undefined
+            : `${formatCount(total)} ${total === 1 ? 'product' : 'products'}`
+        }
+      />
     </>
   );
 }
