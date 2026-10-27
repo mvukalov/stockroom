@@ -59,10 +59,10 @@ A control the current role may not use stays visible and focusable. Its reason (
 
 ## Quality
 
-![The Dashboard at 375 px wide: four KPI cards in two columns and the low-stock list below them; the page title in the top bar is cut off at this width.](docs/images/dashboard-mobile.png)
+![The Dashboard at 375 px wide: the top bar with the menu button and the demo user switcher, four KPI cards in two columns and the low-stock list below them.](docs/images/dashboard-mobile.png)
 
 - **Unit and component tests:** Vitest and React Testing Library, 1,153 tests in 90 files on 2026-10-27 (contract 78, domain 253, seed 13, web app 809). Component tests find elements by role and label and run against the mock API.
-- **End-to-end tests:** Playwright in Chromium against the production build, at 1280 px and 375 px: 111 passed on 2026-10-27 (68 desktop, 43 mobile), plus one that runs only against a deployed site. axe reports zero violations on every route at both widths, per role on screens with guarded controls, and in the loading, empty and error states. What the suite covers: [`docs/testing.md`](docs/testing.md).
+- **End-to-end tests:** Playwright in Chromium against the production build, at 1280 px and 375 px: 147 passed on 2026-10-27 (86 desktop, 61 mobile), plus one that runs only against a deployed site. axe reports zero violations on every route at both widths, per role on screens with guarded controls, and in the loading, empty and error states. What the suite covers: [`docs/testing.md`](docs/testing.md).
 - **Storybook** with the a11y addon: stories for the shared atoms, molecules and organisms and for each screen's view.
 - **Lighthouse on the live site,** 2026-10-27, Lighthouse 13.5.0, mobile preset with simulated throttling, median of 5 runs ([details](docs/performance/production-lighthouse.md)):
 
