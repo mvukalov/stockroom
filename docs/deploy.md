@@ -1,6 +1,6 @@
 # Deploying the demo
 
-The phase 1 demo is a static site. The mock API (MSW) runs in the visitor's browser, so there is no server, database or secret. It is hosted on **Vercel**, deployed by Vercel's Git integration. There is no GitHub Actions workflow; CI is phase 3.
+The phase 1 demo is a static site. The mock API (MSW) runs in the visitor's browser, so there is no server, database or secret. It is hosted on **Vercel**, deployed by Vercel's Git integration, and live at https://stockroom-web-five.vercel.app. There is no GitHub Actions workflow; CI is phase 3.
 
 All build and routing settings are in [`vercel.json`](../vercel.json) at the repository root. The few settings that cannot be committed are listed under [Project settings](#project-settings).
 
@@ -71,6 +71,12 @@ Run the smoke subset of the e2e suite against the site (see [Testing](testing.md
 
 ```
 E2E_BASE_URL=https://<deployment-url> pnpm e2e --grep @smoke
+```
+
+For production:
+
+```
+E2E_BASE_URL=https://stockroom-web-five.vercel.app pnpm e2e --grep @smoke
 ```
 
 It covers:
