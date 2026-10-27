@@ -16,7 +16,7 @@ Read first: `context/design-direction.md` (top bar, typography, spacing), `conte
 
 ### Fix
 
-- [ ] After the fix, at 375 px and wider the top bar title is shown in full on every route, and the role switcher shows enough of the selected name to tell the users apart, with the full name and role still available in the open list. At 320 px and at 200 % text size nothing overlaps or leaves the screen; a title that still cannot fit there may be cut with an ellipsis, as it is now, and the plan says at which width.
+- [ ] After the fix, below `md` the repeated top bar title is not shown (the page `<h1>` is directly below it); from `md` up it is shown in full for every role and route (decided after the measurement, replacing "at 375 px and wider the top bar title is shown in full on every route"). The role switcher shows enough of the selected name to tell the users apart, with the full name and role still available in the open list. At 320 px and at 200 % text size nothing overlaps or leaves the screen; a title that still cannot fit there may be cut with an ellipsis, as it is now, and the plan says at which width.
 - [ ] The role switcher keeps an accessible name and a visible way to tell that it is a demo control, not a login. The read-only lock and its accessible name stay.
 - [ ] Keyboard order, focus visibility, the drawer button and the disabled search field behave as before. No fixed pixel widths: use the existing tokens, `rem`, container queries and the existing mixins.
 - [ ] No horizontal page scroll at 320 px, and the top bar height does not change when data arrives (the layout stability check from `008_02` stays green).
@@ -33,7 +33,7 @@ Read first: `context/design-direction.md` (top bar, typography, spacing), `conte
 
 ### After merge
 
-- [ ] Retake `docs/images/dashboard-mobile.png` from the production URL (375 px, DPR 2, same method as before), update its alt text, and commit it in a small `docs/` branch that Martin merges. Remove the "Small issues found" note about the title from `process-notes/follow-ups.md`.
+- [ ] Retake `docs/images/dashboard-mobile.png` from the production URL (375 px, DPR 2, same method as before), update its alt text, and commit it in a small `docs/` branch, merged by `/feature complete` after Martin approves the diff. Remove the "Small issues found" note about the title from `process-notes/follow-ups.md`.
 
 ## Decisions
 

@@ -7,6 +7,15 @@
   align-items: center;
   gap: var(--space-2);
   min-height: var(--control-height);
+
+  // The container is the top bar's content box: 18rem at 320 px, and one row needs
+  // about 16.2rem with the menu button and the lock. Below 17rem (enlarged text),
+  // the label goes above the select and the select may shrink, instead of the
+  // switcher leaving the screen.
+  @container (width < 17rem) {
+    flex-wrap: wrap;
+    padding-block: var(--space-2);
+  }
 }
 
 // Always visible: the control is a demo device, not a login.
@@ -32,17 +41,22 @@
 .select {
   flex: 0 1 auto;
   width: auto;
-  // Shrinks with the page title on a narrow screen, but never so far that the
-  // selected name cannot be read. The full name and role are in the open list.
+  // Shrinks before the page title, but never so far that the selected name cannot
+  // be read. The full name and role are in the open list.
   min-width: 7rem;
+
+  @container (width < 17rem) {
+    min-width: min(7rem, 100%);
+  }
 }
 
-// The full badge from 768 px; below that only its lock, so the top bar fits 375 px.
+// The full badge once the top bar is 40rem wide; below that only its lock, so the
+// page title keeps its width at 768 px (the sidebar leaves the top bar 33rem).
 .readOnly {
   display: none;
   flex-shrink: 0;
 
-  @include mixins.from-md {
+  @container (width >= 40rem) {
     display: inline-flex;
   }
 }
@@ -58,7 +72,7 @@
   background-color: var(--color-neutral-bg);
   color: var(--color-neutral);
 
-  @include mixins.from-md {
+  @container (width >= 40rem) {
     display: none;
   }
 }
