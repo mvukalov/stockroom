@@ -14,7 +14,7 @@
 - `packages/contract`: Zod schemas and inferred types only.
 - `packages/seed`: deterministic seed generation (fixed faker seed).
 - `apps/web` may import from all packages; packages never import from `apps/*`.
-- Permissions are the pure function `(user, action, resource) => boolean` in `domain`. UI guards call it; they never re-implement rules.
+- Permissions are the pure function `can(user, action) => boolean` in `domain`. UI guards call it; they never re-implement rules.
 
 ## React
 

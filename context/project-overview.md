@@ -41,9 +41,9 @@ Language: English only (UI, content, code, docs, commits).
 | Fake data | `@faker-js/faker` with a fixed seed | |
 | Tests | Vitest, React Testing Library, Playwright + axe, contract tests | |
 | CI/CD | GitHub Actions, Lighthouse CI, Docker | |
-| Static demo hosting (phase 1) | Vercel, Git integration | `docs/deploy.md` |
+| Static demo hosting (phase 1) | Vercel, Git integration, live at https://stockroom-web-five.vercel.app | `docs/deploy.md` |
 
-Not used: Next.js (summit-drift covers it), Tailwind, Angular/Vue.
+Not used: Next.js, Tailwind, Angular/Vue.
 
 ### Still open (decide via ADR before the phase that needs it)
 
@@ -63,7 +63,7 @@ Decisions, context files, ADRs, screen list, design direction, Lovable prototype
 - Contract package (Zod schemas shared by client, mock and real API).
 - MSW handlers implementing the contract, backed by deterministic seed data.
 - UI features (section 6), tests, Storybook.
-- **Exit criteria:** every wave-1 feature works end to end on mocks; unit, component, e2e and a11y tests green; deployed as a static demo.
+- **Exit criteria:** every wave-1 feature works end to end on mocks; unit, component, e2e and a11y tests green; deployed as a static demo (https://stockroom-web-five.vercel.app).
 
 ### Phase 2: Thin backend
 - Real API in the same repo implementing the same contract.
@@ -192,7 +192,7 @@ Not prototyped, specified by text only: the VIEWER pass (rules above), a narrow-
 - URL filters are parsed from `useSearchParams` through a Zod schema from `packages/contract`.
 - Every significant decision gets an ADR.
 
-## 10. Evidence to show on GitHub
+## 10. Evidence in the repository
 
 Green CI badge, coverage threshold that fails the build, Lighthouse budget on every PR, deployed app and Storybook linked in README, all work through PRs and issues, README with decisions and trade-offs, one hard problem measured before/after (table performance with and without virtualization), `context/` and `.claude/` kept in the repo.
 
