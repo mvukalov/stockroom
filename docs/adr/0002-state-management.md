@@ -2,17 +2,16 @@
 
 - **Status:** Accepted (Redux Toolkit assumed confirmed on 2026-10-02; flip to Superseded if Martin chooses Zustand)
 - **Date:** 2026-10-02
+- Editorial revision 2026-10-27: removed references to job-market research; the decision is unchanged.
 
 ## Context
 
 The brief requires a clear separation of server state and client state. Server state (products, movements, orders, stock levels) is cached remote data. Client state is everything else. With server state handled by a query library, the remaining client state is small, so any client-state library has to justify itself with real work.
 
-Job ads (14 reviewed, Oct 2026) name Redux explicitly in two (a React ad and Orqa) and Flux in a third (q agency, together with CQRS/event sourcing). They list these as examples, not requirements. Evidence is weak.
-
 ## Options
 
 1. **Zustand.** Minimal, proportional to the amount of client state. Shows restraint.
-2. **Redux Toolkit.** More ad coverage. Risk: looks like cargo cult if it only holds trivial UI state.
+2. **Redux Toolkit.** Risk: looks like cargo cult if it only holds trivial UI state.
 
 ## Decision
 
@@ -24,7 +23,7 @@ Job ads (14 reviewed, Oct 2026) name Redux explicitly in two (a React ad and Orq
 - The order status state machine lives in the `domain` package (pure functions), driven by `useReducer` locally. It is **not** in Redux.
 - Rule: no server data is copied into the Redux store.
 
-The justification for Redux in the README and on interviews is the event flow (actions as events, reducers as projections), which mirrors the append-only movement log. It is not "global state".
+The justification for Redux is the event flow (actions as events, reducers as projections), which mirrors the append-only movement log. It is not "global state".
 
 ## Consequences
 

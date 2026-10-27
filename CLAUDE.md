@@ -1,6 +1,6 @@
 # Stockroom
 
-Inventory and orders management app with event-sourced stock movements. Portfolio project that proves engineering depth (React/TypeScript, state management, architecture, contract-first monorepo). Developer = architect (Martin), Claude = executor.
+Inventory and orders management app with event-sourced stock movements, built with React and TypeScript as a contract-first monorepo with a framework-free domain layer. Developer = architect (Martin), Claude = executor.
 
 ## Read before working
 

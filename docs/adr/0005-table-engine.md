@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-05
+- Editorial revision 2026-10-27: removed references to job-market research; the decision is unchanged.
 
 ## Context
 
@@ -15,7 +16,7 @@ What the table has to do here is narrower than what table libraries are built fo
 - **The public API must not expose the engine.** The spec defines `ColumnDef<T>` and compound parts (`Table.Toolbar`, `Table.BulkBar`, `Table.Pagination`, `Table.Empty`) over the contract, not over a library's types.
 - **Virtualization is a separate decision** (its own ADR before the virtualized movements feature). It does not depend on the table engine: a virtualization library works with plain table markup.
 
-Facts checked on 2026-10-05: `@tanstack/react-table` is at 9.2.5 (MIT, peer `react >=18`). This ADR does not rely on details of its v9 API, which should be read from the official docs if the option is chosen. No job-ad review was done for this decision, unlike ADR-0001 and ADR-0002, so there is no market evidence either way; add it here if Martin collects some.
+Facts checked on 2026-10-05: `@tanstack/react-table` is at 9.2.5 (MIT, peer `react >=18`). This ADR does not rely on details of its v9 API, which should be read from the official docs if the option is chosen.
 
 ## Options
 

@@ -45,7 +45,7 @@ Read first: `context/coding-standards.md` (React, Routing, Accessibility, Testin
 
 ## Decisions
 
-1. **Cancel is the only action in this phase.** Confirming, picking and shipping an order (and the stock movements they cause) are not part of the portfolio's phase 1 scope unless a later spec adds them.
+1. **Cancel is the only action in this phase.** Confirming, picking and shipping an order (and the stock movements they cause) are not part of the phase 1 scope unless a later spec adds them.
 2. **Cancel is pessimistic, not optimistic.** The status changes only after the server confirms. The toast has no Undo because there is no un-cancel.
 3. **Cancelling is idempotent**, so Retry after a lost response is safe, and a repeated request returns the order unchanged.
 4. **Reservation is shown only if the contract provides it** and is never recomputed in the UI (ADR-0003 keeps availability a read model).

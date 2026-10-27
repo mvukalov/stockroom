@@ -1,6 +1,6 @@
 # Explain Action
 
-Purpose: help me understand and defend every change in an interview.
+Purpose: help me understand and defend every change in review.
 
 Do not commit, push, open a PR or merge in this action. Do not ask me about committing. Committing happens only in `/feature complete`.
 
@@ -13,7 +13,7 @@ Do not commit, push, open a PR or merge in this action. Do not ask me about comm
 4. End with:
    - **How it connects:** the data/control flow between these files
    - **Decisions and trade-offs:** what alternatives existed and why this one was chosen
-   - **Likely interview questions** about this feature (2–3), with short answers
+   - **Likely review questions** about this feature (2–3), with short answers
 5. After the output, tell me the next step: "Next: `/feature complete`. Optional: `/feature review`."
 
 ## Output Format
@@ -27,4 +27,4 @@ What it does and why.
 
 ## Decisions and Trade-offs
 
-## Likely Interview Questions
+## Likely Review Questions

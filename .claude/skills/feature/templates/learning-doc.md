@@ -4,10 +4,10 @@
 
 ---
 
-# <Feature name>: što smo napravili, zašto i kako to objasniti na razgovoru
+# <Feature name>: što smo napravili, zašto i kako to objasniti
 
 > Projekt: Stockroom · PR [#<n>](<PR URL>) · spec: `context/features/<name>-spec.md` · datum: <YYYY-MM-DD>
-> Privatne bilješke za učenje i pripremu za razgovor za posao. Pisano kao da o ovoj temi ne znaš ništa.
+> Privatne bilješke za učenje. Pisano kao da o ovoj temi ne znaš ništa.
 
 ## 1. Ukratko (30 sekundi)
 
@@ -63,11 +63,11 @@
 
 <Mention what is deliberately out of scope and which later feature handles it. Mark any unverified assumptions.>
 
-## 8. Zašto je ovo važno za mid poziciju
+## 8. Što ovo pokazuje u repozitoriju
 
-<Which job-ad requirements this covers. The junior vs mid difference for this topic. What an employer sees on GitHub without asking.>
+<What this feature covers and which engineering skills it exercises. What a reader sees in the repository without asking.>
 
-## 9. Kako to obraniti na razgovoru za posao
+## 9. Pitanja za review
 
 <8–12 questions. Each: the question in bold, then a short first-person answer as a quote, grounded in what this feature actually did.>
 
@@ -81,6 +81,6 @@
 
 <How later features build on this one.>
 
-## 11. Brzi podsjetnik (za dan prije razgovora)
+## 11. Brzi podsjetnik
 
 <6–10 bullet points, the minimum to remember.>
