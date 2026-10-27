@@ -65,6 +65,7 @@ Only what a real browser is needed for; logic stays in the Vitest tests.
 - **Disabled reasons:** Escape closes the reason first and the native dialog or row menu second; the reason stays inside the viewport, does not cover its control and is not clipped by the table scroll region or the New movement drawer; only one reason is shown at a time.
 - **Roles:** switching ADMIN to VIEWER and back on Products without a refetch; the three mutations as the role that may do them (archive, create a movement and undo it, cancel an order); the same three refused for a VIEWER with no mutating request sent.
 - **Virtualized lists** (Movements, Audit log): a window of rows, the next page loaded once, focus kept while scrolling, the slow and error mock scenarios.
+- **Layout stability while a list loads** (Products, Orders, Movements, Audit log, at both widths): the table top stays within 1 px when the rows arrive, a `DataTable` draws as many skeleton rows as the page then shows, and the layout shift score stays at or below 0.1. Local preview only, not `@smoke`.
 - **Keyboard:** skip link, sidebar, role switcher and a page's main action, with a visible focus ring at each stop.
 - **Deploy:** deep links and reloads with query strings, the worker in control, `/robots.txt` as text, cache headers against a deployed site, and the startup error when service workers are blocked or the mock's code fails to load.
 
@@ -73,7 +74,7 @@ Only what a real browser is needed for; logic stays in the Vitest tests.
 - Two projects: `desktop` (1280 px) runs everything, `mobile` (375 px) runs the tests tagged `@mobile`, where the layout matters.
 - `@smoke` marks the subset that also runs against a deployed site.
 - Every test starts in a new browser context: the mock store lives in the page, so each test gets fresh seed data and the default ADMIN user. Other roles are picked in the role switcher.
-- Locators are roles, labels and text. No CSS selectors and no test ids.
+- Locators are roles, labels and text. No CSS selectors and no test ids. One exception: the layout stability check samples the table once per animation frame inside the page, before Playwright locators can act, with `document.querySelector('main table')`, a semantic element rather than a class.
 - No fixed waits. "Nothing was sent" is asserted by sending a marker request and checking what was recorded before it (`e2e/support/requests.ts`).
 - Files are named `*.e2e.ts`, so Vitest does not collect them.
 

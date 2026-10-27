@@ -380,8 +380,8 @@ describe('states', () => {
 
     const table = screen.getByRole('table');
     expect(table).toHaveAttribute('aria-busy', 'true');
-    // Never more than 10 skeleton rows.
-    expect(within(table).getAllByRole('row')).toHaveLength(1 + 10);
+    // One skeleton row per row of the page (25).
+    expect(within(table).getAllByRole('row')).toHaveLength(1 + 25);
     expect(screen.getByRole('status')).toHaveTextContent('Loading shipments…');
     expect(screen.getByText('Page 1')).toBeVisible();
     expect(headerCheckbox()).toBeDisabled();

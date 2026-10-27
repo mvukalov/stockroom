@@ -1,0 +1,6 @@
+// One line high even when empty; `lh` follows the font size and zoom.
+.count {
+  min-height: 1lh;
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}

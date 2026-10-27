@@ -7,6 +7,7 @@ import { VisuallyHidden } from '../../components/atoms/VisuallyHidden/VisuallyHi
 import { EmptyState } from '../../components/molecules/EmptyState/EmptyState';
 import { ErrorBanner } from '../../components/molecules/ErrorBanner/ErrorBanner';
 import type { OptionsState } from '../../components/molecules/OptionsNotice/OptionsNotice';
+import { PageCount } from '../../components/molecules/PageCount/PageCount';
 import { FilterChips } from '../../components/organisms/DataTable/TableParts';
 import { VirtualTable } from '../../components/organisms/VirtualTable/VirtualTable';
 import { copyStatusText, type CopyStatus } from '../../hooks/useCopyId';
@@ -26,13 +27,11 @@ export const AUDIT_DESCRIPTION =
 
 export const END_OF_HISTORY = 'End of history';
 
-/** Under the page title: the count once data has arrived, then the description. */
+/** Under the page title: the count (its line kept while loading), then the description. */
 export function AuditSummary({ total }: { total: number | undefined }) {
   return (
     <>
-      {total !== undefined && (
-        <p className={styles.count}>{eventCount(total)}</p>
-      )}
+      <PageCount text={total === undefined ? undefined : eventCount(total)} />
       <p>{AUDIT_DESCRIPTION}</p>
     </>
   );

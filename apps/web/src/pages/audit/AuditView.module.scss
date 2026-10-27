@@ -1,11 +1,6 @@
 // The list card, toolbar, messages and copy status follow the Movements list
 // (`MovementsView.module.scss`); copied on purpose, see the ADR-0006 revisit note.
 
-.count {
-  color: var(--color-text);
-  font-weight: var(--font-weight-medium);
-}
-
 // The list card: filters, chips, messages and the table.
 .results {
   min-width: 0;

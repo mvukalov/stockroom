@@ -4,6 +4,7 @@ import type { OrdersPage, OrdersQuery, PageSize } from '@stockroom/contract';
 
 import { Button } from '../../components/atoms/Button/Button';
 import { EmptyState } from '../../components/molecules/EmptyState/EmptyState';
+import { PageCount } from '../../components/molecules/PageCount/PageCount';
 import { DataTable } from '../../components/organisms/DataTable/DataTable';
 import { Table } from '../../components/organisms/DataTable/Table';
 import type { ItemNoun } from '../../components/organisms/DataTable/tableContext';
@@ -12,7 +13,6 @@ import { formatCount } from '../../utils/formatCount';
 import { ORDER_COLUMNS } from './orderColumns';
 import { orderFilterChips, type OrderFilterKey } from './orderFilters';
 import { OrdersToolbar, type OrderFilterChange } from './OrdersToolbar';
-import styles from './OrdersView.module.scss';
 
 export const ORDERS_LOAD_ERROR =
   "We couldn't load orders. Check your connection and try again.";
@@ -22,16 +22,18 @@ export const ORDERS_DESCRIPTION =
 
 const ORDER_NOUN: ItemNoun = { one: 'order', other: 'orders' };
 
-/** Under the page title: the description, then the count once data has arrived. */
+/** Under the page title: the description, then the count (its line kept while loading). */
 export function OrdersSummary({ total }: { total: number | undefined }) {
   return (
     <>
       <p>{ORDERS_DESCRIPTION}</p>
-      {total !== undefined && (
-        <p className={styles.count}>
-          {formatCount(total)} {total === 1 ? 'order' : 'orders'}
-        </p>
-      )}
+      <PageCount
+        text={
+          total === undefined
+            ? undefined
+            : `${formatCount(total)} ${total === 1 ? 'order' : 'orders'}`
+        }
+      />
     </>
   );
 }

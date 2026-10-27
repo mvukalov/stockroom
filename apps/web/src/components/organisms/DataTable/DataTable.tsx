@@ -25,9 +25,6 @@ import { TableEmpty } from './TableParts';
 import { TablePagination } from './TablePagination';
 import type { useRowSelection } from './useRowSelection';
 
-/** At most this many skeleton rows, whatever the page size. */
-const MAX_SKELETON_ROWS = 10;
-
 const NO_FILTERS: readonly ActiveFilter[] = [];
 
 export type DataTableProps<T, S extends string> = {
@@ -254,32 +251,32 @@ export function DataTable<T, S extends string>({
             </tr>
           </thead>
           <tbody>
+            {/* One skeleton row per row of the page, at the table row height. The
+                footer still moves when the rows arrive if they are taller (wrapped
+                text, row actions) or fewer (a short last page). */}
             {rows === undefined
-              ? Array.from(
-                  { length: Math.min(pageSize, MAX_SKELETON_ROWS) },
-                  (_, index) => (
-                    <tr key={index}>
-                      {selection !== undefined && (
-                        <td className={styles.selectCell}>
-                          <Skeleton width="var(--checkbox-size)" />
-                        </td>
-                      )}
-                      {visibleColumns.map((column) => (
-                        <td
-                          key={column.id}
-                          className={cx(column.align === 'end' && styles.end)}
-                        >
-                          <Skeleton
-                            width={column.align === 'end' ? '3em' : '70%'}
-                            className={cx(
-                              column.align === 'end' && styles.endSkeleton,
-                            )}
-                          />
-                        </td>
-                      ))}
-                    </tr>
-                  ),
-                )
+              ? Array.from({ length: pageSize }, (_, index) => (
+                  <tr key={index}>
+                    {selection !== undefined && (
+                      <td className={styles.selectCell}>
+                        <Skeleton width="var(--checkbox-size)" />
+                      </td>
+                    )}
+                    {visibleColumns.map((column) => (
+                      <td
+                        key={column.id}
+                        className={cx(column.align === 'end' && styles.end)}
+                      >
+                        <Skeleton
+                          width={column.align === 'end' ? '3em' : '70%'}
+                          className={cx(
+                            column.align === 'end' && styles.endSkeleton,
+                          )}
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))
               : rows.map((row) => {
                   const id = getRowId(row);
                   const isSelected = selectedIds.has(id);
