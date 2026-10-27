@@ -62,6 +62,7 @@ Only what a real browser is needed for; logic stays in the Vitest tests.
 
 - **axe, zero violations:** every route at 1280 and 375 px. Screens with permission-guarded controls (Products, Movements, Order detail) once per role; the list screens also while loading, empty and after a failed load.
 - **No horizontal page scroll** at 375 px on every route.
+- **Top bar** (`e2e/topBar.e2e.ts`), every route and role: at 375 and 320 px the repeated title is hidden, the top bar stays inside the screen and the page does not scroll sideways; at 768 and 1024 px the title is shown in full (`scrollWidth <= clientWidth`).
 - **Disabled reasons:** Escape closes the reason first and the native dialog or row menu second; the reason stays inside the viewport, does not cover its control and is not clipped by the table scroll region or the New movement drawer; only one reason is shown at a time.
 - **Roles:** switching ADMIN to VIEWER and back on Products without a refetch; the three mutations as the role that may do them (archive, create a movement and undo it, cancel an order); the same three refused for a VIEWER with no mutating request sent.
 - **Virtualized lists** (Movements, Audit log): a window of rows, the next page loaded once, focus kept while scrolling, the slow and error mock scenarios.

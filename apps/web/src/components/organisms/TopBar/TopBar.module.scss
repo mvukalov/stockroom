@@ -18,27 +18,32 @@
   }
 }
 
-// The menu button opens the drawer, which only exists below 768 px.
+// The menu button opens the drawer, which only exists below 768 px. Without the
+// title next to it, its margin keeps the role switcher on the right.
 .menu {
   display: inline-flex;
   flex-shrink: 0;
+  margin-inline-end: auto;
 
   @include mixins.from-md {
     display: none;
   }
 }
 
+// Below 768 px the title is not shown: the page <h1> repeats it right below, and the
+// role switcher needs the width. From 768 px it never gives up width; the switcher
+// shrinks instead (its read-only badge waits for a wider top bar).
 .title {
-  // Sized from its content like the role switcher, so on a narrow screen both
-  // shrink instead of the switcher pushing the title out.
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
+  display: none;
+  flex: 1 0 auto;
   font-size: var(--font-size-page-title);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
-  text-overflow: ellipsis;
   white-space: nowrap;
+
+  @include mixins.from-md {
+    display: block;
+  }
 }
 
 // Shown only when the top bar itself is at least 768 px wide: at a 768 px viewport

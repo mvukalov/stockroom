@@ -95,7 +95,7 @@ export function RoleSwitcher(props: RoleSwitcherProps) {
             <RoleBadge role={currentUser.role} />
           </span>
           {/* Every mutating control is disabled with its reason; this says why at a
-              glance. Narrow viewports keep the lock only, named for assistive technology. */}
+              glance. Top bars under 40rem keep the lock only, named for assistive technology. */}
           {isReadOnly(currentUser) && (
             <>
               <Badge tone="neutral" icon={Lock} className={styles.readOnly}>
